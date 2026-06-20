@@ -87,7 +87,7 @@ function renderFooter() {
       <div class="container">
         <div class="footer-bottom">
           <span class="footer-copy">&copy; 2026 TEDxUniversityofAsiaPacific. All rights reserved.</span>
-          <span class="footer-copy">Made with &#x2764;&#xFE0F; by UAP Students</span>
+          <span class="footer-copy">Made By Sajjad Arnob</span>
         </div>
       </div>
     </footer>`;
