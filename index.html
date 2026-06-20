@@ -238,7 +238,7 @@ async function loadHomeData() {
         if (speakers.length > 0) {
             grid.innerHTML = speakers.slice(0, 3).map((s, i) => `
                 <div class="card reveal" style="transition-delay:${i * .1}s">
-                  <div class="card-img"><img src="${s.image || ''}" alt="${s.name}" loading="lazy"><div class="card-img-overlay"></div></div>
+                  <div class="card-img"><img src="${s.photo_url || s.image_url || ''}" alt="${s.name}" loading="lazy"><div class="card-img-overlay"></div></div>
                   <div class="card-body">
                     <h3 class="card-name">${s.name}</h3>
                     <p class="card-title">${s.title}</p>
