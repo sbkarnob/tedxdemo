@@ -47,6 +47,11 @@
 renderHeader('speakers');
 renderFooter();
 
+
+function makeSlug(name) {
+    return (name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
 let allSpeakers = [];
 async function loadSpeakers() {
     try {
@@ -72,7 +77,7 @@ function renderSpeakers(list) {
           <h3 class="card-name">${s.name}</h3>
           <p class="card-title">${s.title}</p>
           <p class="card-topic">"${s.topic}"</p>
-          <a href="speaker-details.html?id=${s.id}" class="btn-sm">View Profile <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+          <a href="/speaker-details/${makeSlug(s.name)}" class="btn-sm">View Profile <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
         </div>
       </div>`).join('');
     initReveals();

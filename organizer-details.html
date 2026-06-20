@@ -23,15 +23,32 @@
 renderHeader('organizers');
 renderFooter();
 
+
+function makeSlug(name) {
+    return (name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
 (async function() {
-    const id = new URLSearchParams(window.location.search).get('id');
+    // Support both /organizer-details/john-doe (slug) and ?id=xxx
+    const pathSlug = window.location.pathname.split('/').pop();
+    const urlId = new URLSearchParams(window.location.search).get('id');
     const main = document.getElementById('mainContent');
-    if (!id) { main.innerHTML = '<div style="text-align:center;padding:200px"><h2>Not Found</h2><a href="organizers.html" class="btn-back" style="margin-top:20px;display:inline-flex">&larr; Back to Team</a></div>'; return; }
+
+    // wait for db
+    let retries = 0;
+    while (!window.db.client && retries < 20) { await new Promise(r => setTimeout(r, 100)); retries++; }
+    if (!window.db.client) { main.innerHTML = '<div style="text-align:center;padding:200px"><h2>Not connected</h2></div>'; return; }
+
+    let o = null;
     try {
-        // wait for db
-        let retries = 0;
-        while (!window.db.client && retries < 20) { await new Promise(r => setTimeout(r, 100)); retries++; }
-        const o = window.db.client ? await window.db.getById('organizers', id) : null;
+        if (urlId) {
+            o = await window.db.getById('organizers', urlId);
+        } else if (pathSlug && pathSlug !== 'organizer-details.html') {
+            const all = await window.db.getActive('organizers');
+            o = all.find(x => makeSlug(x.name) === pathSlug) || null;
+        }
+    } catch(e) { o = null; }
+    try {
         if (!o) { main.innerHTML = '<div style="text-align:center;padding:200px"><h2>Not Found</h2><a href="organizers.html" class="btn-back" style="margin-top:20px;display:inline-flex">&larr; Back</a></div>'; return; }
         document.title = o.name + ' — TEDxUAP 2026';
         let socials = '';
@@ -44,7 +61,7 @@ renderFooter();
         try {
             const others = await window.db.getActive('organizers');
             others.filter(x => x.id !== id).slice(0, 4).forEach(x => {
-                teamHtml += `<a href="organizer-details.html?id=${x.id}" class="speaker-mini"><img src="${x.photo_url || x.image_url || ''}" alt="${x.name}"><div style="flex:1;min-width:0"><div style="font-size:.88rem;font-weight:600">${x.name}</div><div style="font-size:.72rem;color:var(--text-dim)">${x.role}</div></div><svg width="14" height="14" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>`;
+                teamHtml += `<a href="/organizer-details/${makeSlug(x.name)}" class="speaker-mini"><img src="${x.photo_url || x.image_url || ''}" alt="${x.name}"><div style="flex:1;min-width:0"><div style="font-size:.88rem;font-weight:600">${x.name}</div><div style="font-size:.72rem;color:var(--text-dim)">${x.role}</div></div><svg width="14" height="14" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>`;
             });
         } catch(e) {}
 
