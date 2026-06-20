@@ -1,8 +1,3 @@
 {
-  "cleanUrls": false,
-  "rewrites": [
-    { "source": "/admin", "destination": "/admin/index.html" },
-    { "source": "/dashboard.html", "destination": "/admin/dashboard.html" },
-    { "source": "/speakers.html", "destination": "/admin/speakers.html" }
-  ]
+  "cleanUrls": false
 }
