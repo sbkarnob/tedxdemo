@@ -1,6 +1,6 @@
 const CONFIG = {
-    SUPABASE_URL: 'https://bylbwzucpdseufnlbbvt.supabase.co',
-    SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5bGJ3enVjcGRzZXVmbmxiYnZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyNDMxMDUsImV4cCI6MjA5NTgxOTEwNX0.JeoCxqpBX0Rm2MVurhnrZ5rZozeEd3omE56-pM4qp9Y',
+    SUPABASE_URL: 'https://cfqnkenegssahgutfvtr.supabase.co',
+    SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNmcW5rZW5lZ3NzYWhndXRmdnRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5Mjg2MzYsImV4cCI6MjA5NzUwNDYzNn0.0zmGQifSezQstJ42wbleghNM6slVLGqQ7TPJRx2FZN0',
     EMAILJS_SERVICE_ID: '',
     EMAILJS_TEMPLATE_ID: '',
     EMAILJS_PUBLIC_KEY: '',
