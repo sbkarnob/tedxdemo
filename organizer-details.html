@@ -28,6 +28,9 @@ renderFooter();
     const main = document.getElementById('mainContent');
     if (!id) { main.innerHTML = '<div style="text-align:center;padding:200px"><h2>Not Found</h2><a href="organizers.html" class="btn-back" style="margin-top:20px;display:inline-flex">&larr; Back to Team</a></div>'; return; }
     try {
+        // wait for db
+        let retries = 0;
+        while (!window.db.client && retries < 20) { await new Promise(r => setTimeout(r, 100)); retries++; }
         const o = window.db.client ? await window.db.getById('organizers', id) : null;
         if (!o) { main.innerHTML = '<div style="text-align:center;padding:200px"><h2>Not Found</h2><a href="organizers.html" class="btn-back" style="margin-top:20px;display:inline-flex">&larr; Back</a></div>'; return; }
         document.title = o.name + ' — TEDxUAP 2026';

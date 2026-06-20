@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Organizer — TEDxUAP 2026</title>
+<title>Organizers — TEDxUAP 2026</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='6' fill='%23050709'/%3E%3Ctext x='4' y='28' font-family='Arial Black' font-weight='900' font-size='14' fill='white'%3ETED%3C/text%3E%3Ctext x='30' y='28' font-family='Arial Black' font-weight='900' font-size='14' fill='%23FF0000'%3Ex%3C/text%3E%3C/svg%3E"/>
 <link rel="stylesheet" href="css/styles.css"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -14,9 +14,37 @@
 </head>
 <body>
 <div id="site-header"></div>
-<main style="padding-top:120px;min-height:100vh" id="mainContent">
-  <div style="text-align:center;padding:200px;color:var(--text-faint)"><span class="spinner"></span></div>
-</main>
+
+<div class="page-hero">
+  <div class="page-hero-bg"></div>
+  <div class="page-hero-grid"></div>
+  <div class="container" style="position:relative;z-index:1;text-align:center">
+    <span class="section-tag">The Team Behind</span>
+    <div class="divider" style="margin:12px auto"></div>
+    <h1 style="font-size:clamp(2.2rem,6vw,4rem);font-weight:900;letter-spacing:-.03em;margin-bottom:14px">Our <span style="color:#FF0000">Organizers</span></h1>
+    <p style="color:var(--text-dim);font-size:.95rem;max-width:480px;margin:0 auto;line-height:1.7;font-weight:300">Passionate students who gave months of their lives to make one incredible day happen.</p>
+  </div>
+</div>
+
+<section class="section" style="padding-top:40px">
+  <div class="container">
+    <div class="reveal" style="font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--text-faint);margin-bottom:28px;text-align:center">Core Organizing Team</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;margin-bottom:80px" id="orgGrid">
+      <div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--text-faint)"><span class="spinner"></span></div>
+    </div>
+
+    <div class="reveal" style="text-align:center;margin-bottom:40px">
+      <span class="section-tag">The Heartbeat</span>
+      <div class="divider" style="margin:12px auto"></div>
+      <h2 style="font-size:clamp(1.6rem,3vw,2.2rem);font-weight:800">Event <span style="color:#FF0000">Volunteers</span></h2>
+      <p style="color:var(--text-dim);font-size:.88rem;max-width:400px;margin:10px auto 0;line-height:1.7">The incredible team working behind the scenes.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px" id="volGrid">
+      <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-faint)"><span class="spinner"></span></div>
+    </div>
+  </div>
+</section>
+
 <div id="site-footer"></div>
 
 <script>
@@ -24,65 +52,42 @@ renderHeader('organizers');
 renderFooter();
 
 (async function() {
-    const id = new URLSearchParams(window.location.search).get('id');
-    const main = document.getElementById('mainContent');
-    if (!id) { main.innerHTML = '<div style="text-align:center;padding:200px"><h2>Not Found</h2><a href="organizers.html" class="btn-back" style="margin-top:20px;display:inline-flex">&larr; Back to Team</a></div>'; return; }
     try {
-        const o = window.db.client ? await window.db.getById('organizers', id) : null;
-        if (!o) { main.innerHTML = '<div style="text-align:center;padding:200px"><h2>Not Found</h2><a href="organizers.html" class="btn-back" style="margin-top:20px;display:inline-flex">&larr; Back</a></div>'; return; }
-        document.title = o.name + ' — TEDxUAP 2026';
-        let socials = '';
-        if (o.socials) {
-            if (o.socials.twitter) socials += `<a href="${o.socials.twitter}" class="social-btn-lg">X</a>`;
-            if (o.socials.linkedin) socials += `<a href="${o.socials.linkedin}" class="social-btn-lg">in</a>`;
-            if (o.socials.instagram) socials += `<a href="${o.socials.instagram}" class="social-btn-lg">ig</a>`;
-        }
-        let teamHtml = '';
-        try {
-            const others = await window.db.getActive('organizers');
-            others.filter(x => x.id !== id).slice(0, 4).forEach(x => {
-                teamHtml += `<a href="organizer-details.html?id=${x.id}" class="speaker-mini"><img src="${x.photo_url || x.image_url || ''}" alt="${x.name}"><div style="flex:1;min-width:0"><div style="font-size:.88rem;font-weight:600">${x.name}</div><div style="font-size:.72rem;color:var(--text-dim)">${x.role}</div></div><svg width="14" height="14" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>`;
-            });
-        } catch(e) {}
+        let retries = 0;
+        while (!window.db.client && retries < 20) { await new Promise(r => setTimeout(r, 100)); retries++; }
+        const [orgs, vols] = window.db.client
+            ? await Promise.all([window.db.getActive('organizers'), window.db.getActive('volunteers')])
+            : [[], []];
 
-        main.innerHTML = `
-        <div style="position:absolute;inset:0;height:400px;background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(137,0,0,.1),transparent);pointer-events:none"></div>
-        <div class="container" style="position:relative">
-          <div class="reveal" style="margin-bottom:32px"><a href="organizers.html" class="btn-back"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Back to Team</a></div>
-          <div class="hero-grid-2col" style="gap:40px;align-items:start">
-            <div class="reveal" style="position:sticky;top:120px">
-              <div style="display:flex;justify-content:center;margin-bottom:24px"><div class="avatar-ring"><div class="avatar-inner"><img src="${o.photo_url || o.image_url || ''}" alt="${o.name}"></div></div></div>
-              <div style="text-align:center;margin-bottom:20px">
-                <h1 style="font-size:1.6rem;font-weight:800;margin-bottom:5px">${o.name}</h1>
-                <p style="color:var(--text-dim);font-size:.88rem;margin-bottom:10px">${o.role}</p>
-                <span class="tag">TEDxUAP Organizer</span>
-              </div>
-              <div style="display:flex;justify-content:center;gap:10px;margin-bottom:20px">${socials}</div>
-              <div class="detail-card" style="margin-bottom:14px">
-                <div style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--text-faint);margin-bottom:8px">Organization</div>
-                <p style="font-size:.88rem;font-weight:600">TEDxUniversityofAsiaPacific</p>
-                <p style="font-size:.76rem;color:var(--text-dim);margin-top:3px">Class of 2026</p>
-              </div>
-              <a href="index.html#tickets" class="btn-primary" style="width:100%;justify-content:center;display:flex">&#x1F3AB; Join the Event</a>
+        const orgGrid = document.getElementById('orgGrid');
+        orgGrid.innerHTML = orgs.length ? orgs.map((o, i) => `
+          <div class="org-card reveal" style="transition-delay:${(i%3)*.1}s">
+            <div class="org-card-img"><img src="${o.image || ''}" alt="${o.name}" loading="lazy"><div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(5,7,13,.9))"></div></div>
+            <div class="org-card-body">
+              <div style="font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin-bottom:5px;font-weight:600">${o.role}</div>
+              <h3 style="font-size:1rem;font-weight:700;margin-bottom:6px">${o.name}</h3>
+              <p style="font-size:.78rem;color:var(--text-dim);line-height:1.6;margin-bottom:14px">${(o.description || '').split('. ').slice(0,2).join('. ')}</p>
+              <a href="organizer-details.html?id=${o.id}" class="btn-sm">View Profile <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
             </div>
-            <div>
-              <div class="reveal detail-card" style="margin-bottom:16px">
-                <div style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,0,0,.6);margin-bottom:14px;display:flex;align-items:center;gap:8px"><div style="width:18px;height:1.5px;background:var(--red)"></div> About ${o.name.split(' ')[0]}</div>
-                <p style="color:var(--text);line-height:1.85;font-size:.92rem;font-weight:300">${o.description || 'Description coming soon.'}</p>
-              </div>
-              <div class="reveal detail-card" style="margin-bottom:16px;background:linear-gradient(135deg,rgba(137,0,0,.06),rgba(4,15,30,.4));border-color:rgba(137,0,0,.15)">
-                <div style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,0,0,.6);margin-bottom:14px;display:flex;align-items:center;gap:8px"><div style="width:18px;height:1.5px;background:var(--red)"></div> Role at TEDxUAP</div>
-                <div style="display:flex;align-items:flex-start;gap:14px">
-                  <div style="font-size:1.8rem;flex-shrink:0">&#x1F3AF;</div>
-                  <div><h3 style="font-size:1.05rem;font-weight:700;margin-bottom:6px">${o.role}</h3><p style="font-size:.82rem;color:var(--text-dim);line-height:1.6">TEDxUniversityofAsiaPacific is operated under license from TED. All team members are students of UAP, Dhaka.</p></div>
-                </div>
-              </div>
-              ${teamHtml ? `<div class="reveal"><div style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--text-faint);margin-bottom:14px">Rest of the Team</div><div style="display:grid;gap:10px">${teamHtml}</div></div>` : ''}
+          </div>`).join('')
+          : '<p style="grid-column:1/-1;text-align:center;color:var(--text-faint);padding:40px">Team coming soon...</p>';
+
+        const volGrid = document.getElementById('volGrid');
+        volGrid.innerHTML = vols.length ? vols.map((v, i) => `
+          <div class="vol-card reveal" style="transition-delay:${(i%6)*.05}s">
+            <img src="${v.image || ''}" alt="${v.name}" loading="lazy">
+            <div style="padding:12px 10px">
+              <div style="font-size:.82rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${v.name}</div>
+              <div style="font-size:.66rem;color:var(--text-faint);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${v.role}</div>
             </div>
-          </div>
-        </div>`;
-        setTimeout(initReveals, 50);
-    } catch(e) { main.innerHTML = '<div style="text-align:center;padding:200px"><h2>Error</h2><a href="organizers.html" class="btn-back" style="margin-top:20px;display:inline-flex">&larr; Back</a></div>'; }
+          </div>`).join('')
+          : '<p style="grid-column:1/-1;text-align:center;color:var(--text-faint);padding:40px">Volunteers coming soon...</p>';
+
+        initReveals();
+    } catch(e) {
+        document.getElementById('orgGrid').innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--text-faint);padding:40px">Team coming soon...</p>';
+        document.getElementById('volGrid').innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--text-faint);padding:40px">Volunteers coming soon...</p>';
+    }
 })();
 </script>
 </body>

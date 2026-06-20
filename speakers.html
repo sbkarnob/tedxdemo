@@ -50,6 +50,8 @@ renderFooter();
 let allSpeakers = [];
 async function loadSpeakers() {
     try {
+        let retries = 0;
+        while (!window.db.client && retries < 20) { await new Promise(r => setTimeout(r, 100)); retries++; }
         allSpeakers = window.db.client ? await window.db.getActive('speakers') : [];
         renderSpeakers(allSpeakers);
     } catch(e) {
