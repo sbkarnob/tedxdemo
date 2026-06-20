@@ -83,13 +83,12 @@
 </div>
 
 <script>
-// Redirect if already logged in via Supabase session
-(async function(){
+setTimeout(async function(){
   try {
     const sess = await window.db.getSession();
     if (sess) { window.location.href = 'dashboard.html'; }
   } catch(e) {}
-})();
+}, 800);
 
 function togglePass() {
   var inp = document.getElementById('loginPass');
