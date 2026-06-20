@@ -44,7 +44,7 @@ renderFooter();
         try {
             const others = await window.db.getActive('organizers');
             others.filter(x => x.id !== id).slice(0, 4).forEach(x => {
-                teamHtml += `<a href="organizer-details.html?id=${x.id}" class="speaker-mini"><img src="${x.image || ''}" alt="${x.name}"><div style="flex:1;min-width:0"><div style="font-size:.88rem;font-weight:600">${x.name}</div><div style="font-size:.72rem;color:var(--text-dim)">${x.role}</div></div><svg width="14" height="14" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>`;
+                teamHtml += `<a href="organizer-details.html?id=${x.id}" class="speaker-mini"><img src="${x.photo_url || x.image_url || ''}" alt="${x.name}"><div style="flex:1;min-width:0"><div style="font-size:.88rem;font-weight:600">${x.name}</div><div style="font-size:.72rem;color:var(--text-dim)">${x.role}</div></div><svg width="14" height="14" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>`;
             });
         } catch(e) {}
 
@@ -54,7 +54,7 @@ renderFooter();
           <div class="reveal" style="margin-bottom:32px"><a href="organizers.html" class="btn-back"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Back to Team</a></div>
           <div class="hero-grid-2col" style="gap:40px;align-items:start">
             <div class="reveal" style="position:sticky;top:120px">
-              <div style="display:flex;justify-content:center;margin-bottom:24px"><div class="avatar-ring"><div class="avatar-inner"><img src="${o.image || ''}" alt="${o.name}"></div></div></div>
+              <div style="display:flex;justify-content:center;margin-bottom:24px"><div class="avatar-ring"><div class="avatar-inner"><img src="${o.photo_url || o.image_url || ''}" alt="${o.name}"></div></div></div>
               <div style="text-align:center;margin-bottom:20px">
                 <h1 style="font-size:1.6rem;font-weight:800;margin-bottom:5px">${o.name}</h1>
                 <p style="color:var(--text-dim);font-size:.88rem;margin-bottom:10px">${o.role}</p>
@@ -71,7 +71,7 @@ renderFooter();
             <div>
               <div class="reveal detail-card" style="margin-bottom:16px">
                 <div style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,0,0,.6);margin-bottom:14px;display:flex;align-items:center;gap:8px"><div style="width:18px;height:1.5px;background:var(--red)"></div> About ${o.name.split(' ')[0]}</div>
-                <p style="color:var(--text);line-height:1.85;font-size:.92rem;font-weight:300">${o.description || 'Description coming soon.'}</p>
+                <p style="color:var(--text);line-height:1.85;font-size:.92rem;font-weight:300">${o.bio || o.description || 'Description coming soon.'}</p>
               </div>
               <div class="reveal detail-card" style="margin-bottom:16px;background:linear-gradient(135deg,rgba(137,0,0,.06),rgba(4,15,30,.4));border-color:rgba(137,0,0,.15)">
                 <div style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,0,0,.6);margin-bottom:14px;display:flex;align-items:center;gap:8px"><div style="width:18px;height:1.5px;background:var(--red)"></div> Role at TEDxUAP</div>

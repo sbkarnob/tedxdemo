@@ -2,7 +2,7 @@
   "cleanUrls": false,
   "rewrites": [
     { "source": "/admin", "destination": "/admin/index.html" },
-    { "source": "/admin/", "destination": "/admin/index.html" },
-    { "source": "/admin/reset-password", "destination": "/admin/reset-password.html" }
+    { "source": "/dashboard.html", "destination": "/admin/dashboard.html" },
+    { "source": "/speakers.html", "destination": "/admin/speakers.html" }
   ]
 }
