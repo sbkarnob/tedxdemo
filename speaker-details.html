@@ -23,16 +23,14 @@
 renderHeader('speakers');
 renderFooter();
 
-
-function makeSlug(name) {
-    return (name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-}
-
 (async function() {
     const id = new URLSearchParams(window.location.search).get('id');
     const main = document.getElementById('mainContent');
     if (!id) { main.innerHTML = '<div style="text-align:center;padding:200px"><h2>Speaker Not Found</h2><a href="speakers.html" class="btn-back" style="margin-top:20px;display:inline-flex">&larr; Back to Speakers</a></div>'; return; }
     try {
+        // wait for db
+        let retries = 0;
+        while (!window.db.client && retries < 20) { await new Promise(r => setTimeout(r, 100)); retries++; }
         const s = window.db.client ? await window.db.getById('speakers', id) : null;
         if (!s) { main.innerHTML = '<div style="text-align:center;padding:200px"><h2>Speaker Not Found</h2><a href="speakers.html" class="btn-back" style="margin-top:20px;display:inline-flex">&larr; Back to Speakers</a></div>'; return; }
         document.title = s.name + ' — TEDxUAP 2026';
@@ -48,7 +46,7 @@ function makeSlug(name) {
         try {
             const others = await window.db.getActive('speakers');
             others.filter(o => o.id !== id).slice(0, 3).forEach(o => {
-                moreHtml += `<a href="/speaker-details/${makeSlug(o.name)}" class="speaker-mini"><img src="${o.photo_url || o.image_url || ''}" alt="${o.name}"><div style="flex:1;min-width:0"><div style="font-size:.88rem;font-weight:600">${o.name}</div><div style="font-size:.72rem;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.title}</div></div><svg width="14" height="14" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>`;
+                moreHtml += `<a href="speaker-details.html?id=${o.id}" class="speaker-mini"><img src="${o.photo_url || o.image_url || ''}" alt="${o.name}"><div style="flex:1;min-width:0"><div style="font-size:.88rem;font-weight:600">${o.name}</div><div style="font-size:.72rem;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.title}</div></div><svg width="14" height="14" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>`;
             });
         } catch(e) {}
 
