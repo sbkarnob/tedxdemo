@@ -98,22 +98,22 @@ function renderAdminSidebar(active) {
     const el = document.getElementById('adminSidebar');
     if (!el) return;
     const items = [
-        { section: 'Main', links: [{ href: 'dashboard.html', icon: '📊', label: 'Dashboard', id: 'dashboard' }] },
+        { section: 'Main', links: [{ href: '/admin/dashboard', icon: '📊', label: 'Dashboard', id: 'dashboard' }] },
         { section: 'Content', links: [
-            { href: 'speakers.html', icon: '🎤', label: 'Speakers', id: 'speakers' },
-            { href: 'organizers.html', icon: '👥', label: 'Organizers', id: 'organizers' },
-            { href: 'volunteers.html', icon: '🤝', label: 'Volunteers', id: 'volunteers' },
-            { href: 'sponsors.html', icon: '💎', label: 'Sponsors & Partners', id: 'sponsors' }
+            { href: '/admin/speakers', icon: '🎤', label: 'Speakers', id: 'speakers' },
+            { href: '/admin/organizers', icon: '👥', label: 'Organizers', id: 'organizers' },
+            { href: '/admin/volunteers', icon: '🤝', label: 'Volunteers', id: 'volunteers' },
+            { href: '/admin/sponsors', icon: '💎', label: 'Sponsors & Partners', id: 'sponsors' }
         ]},
         { section: 'Event', links: [
-            { href: 'event.html', icon: '📅', label: 'Event Details', id: 'event' },
-            { href: 'schedule.html', icon: '⏰', label: 'Schedule', id: 'schedule' }
+            { href: '/admin/event', icon: '📅', label: 'Event Details', id: 'event' },
+            { href: '/admin/schedule', icon: '⏰', label: 'Schedule', id: 'schedule' }
         ]},
         { section: 'Communication', links: [
-            { href: 'messages.html', icon: '📧', label: 'Messages', id: 'messages', badge: true }
+            { href: '/admin/messages', icon: '📧', label: 'Messages', id: 'messages', badge: true }
         ]},
         { section: 'Account', links: [
-            { href: 'settings.html', icon: '⚙️', label: 'Settings', id: 'settings' }
+            { href: '/admin/settings', icon: '⚙️', label: 'Settings', id: 'settings' }
         ]}
     ];
 
@@ -172,15 +172,14 @@ function closeAdminSidebar() {
 
 async function adminSignOut() {
     try { await window.db.signOut(); } catch(e) {}
-    window.location.href = 'index.html';
+    window.location.href = '/admin';
 }
 
 async function loadAdminUser() {
     try {
         const session = await window.db.getSession();
-        if (!session) { window.location.href = 'index.html'; return false; }
+        if (!session) { window.location.href = '/admin'; return false; }
 
-        // Show email as fallback name
         const email = session.user?.email || 'Admin';
         const displayName = email.split('@')[0];
         const n = document.getElementById('adminName');
@@ -188,18 +187,17 @@ async function loadAdminUser() {
         if (n) n.textContent = displayName;
         if (a) a.textContent = displayName[0].toUpperCase();
 
-        // Try to load profile for full name
         try {
             const profile = await window.db.getAdminProfile();
             if (profile && profile.full_name) {
                 if (n) n.textContent = profile.full_name;
                 if (a) a.textContent = profile.full_name[0].toUpperCase();
             }
-        } catch(e) { /* profile not set yet — that's okay */ }
+        } catch(e) {}
 
         return true;
     } catch (e) {
-        window.location.href = 'index.html';
+        window.location.href = '/admin';
         return false;
     }
 }

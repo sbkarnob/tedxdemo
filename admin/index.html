@@ -83,12 +83,13 @@
 </div>
 
 <script>
-setTimeout(async function(){
+// Redirect if already logged in via Supabase session
+(async function(){
   try {
     const sess = await window.db.getSession();
-    if (sess) { window.location.href = 'dashboard.html'; }
+    if (sess) { window.location.href = '/admin/dashboard'; }
   } catch(e) {}
-}, 800);
+})();
 
 function togglePass() {
   var inp = document.getElementById('loginPass');
@@ -141,7 +142,7 @@ async function doLogin() {
   try {
     await window.db.signIn(email, pass);
     content.innerHTML = '✓ Redirecting…';
-    window.location.href = 'dashboard.html';
+    window.location.href = '/admin/dashboard';
   } catch(e) {
     var msg = e.message || 'Sign in failed. Check your credentials.';
     if (msg.includes('Invalid login credentials')) msg = 'Incorrect email or password. Please try again.';
