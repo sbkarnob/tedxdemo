@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Organizer — TEDxUAP 2026</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='6' fill='%23050709'/%3E%3Ctext x='4' y='28' font-family='Arial Black' font-weight='900' font-size='14' fill='white'%3ETED%3C/text%3E%3Ctext x='30' y='28' font-family='Arial Black' font-weight='900' font-size='14' fill='%23FF0000'%3Ex%3C/text%3E%3C/svg%3E"/>
-<link rel="stylesheet" href="css/styles.css"/>
+<link rel="stylesheet" href="/css/styles.css"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/config.js"></script>
-<script src="js/supabase-client.js"></script>
-<script src="js/components.js"></script>
-<script src="js/app.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/supabase-client.js"></script>
+<script src="/js/components.js"></script>
+<script src="/js/app.js"></script>
 </head>
 <body>
 <div id="site-header"></div>
@@ -23,69 +23,85 @@
 renderHeader('organizers');
 renderFooter();
 
-(async function() {
-    const id = new URLSearchParams(window.location.search).get('id');
-    const main = document.getElementById('mainContent');
-    if (!id) { main.innerHTML = '<div style="text-align:center;padding:200px"><h2>Not Found</h2><a href="organizers.html" class="btn-back" style="margin-top:20px;display:inline-flex">&larr; Back to Team</a></div>'; return; }
-    try {
-        // wait for db
-        let retries = 0;
-        while (!window.db.client && retries < 20) { await new Promise(r => setTimeout(r, 100)); retries++; }
-        const o = window.db.client ? await window.db.getById('organizers', id) : null;
-        if (!o) { main.innerHTML = '<div style="text-align:center;padding:200px"><h2>Not Found</h2><a href="organizers.html" class="btn-back" style="margin-top:20px;display:inline-flex">&larr; Back</a></div>'; return; }
-        document.title = o.name + ' — TEDxUAP 2026';
-        let socials = '';
-        if (o.socials) {
-            if (o.socials.twitter) socials += `<a href="${o.socials.twitter}" class="social-btn-lg">X</a>`;
-            if (o.socials.linkedin) socials += `<a href="${o.socials.linkedin}" class="social-btn-lg">in</a>`;
-            if (o.socials.instagram) socials += `<a href="${o.socials.instagram}" class="social-btn-lg">ig</a>`;
-        }
-        let teamHtml = '';
-        try {
-            const others = await window.db.getActive('organizers');
-            others.filter(x => x.id !== id).slice(0, 4).forEach(x => {
-                teamHtml += `<a href="organizer-details.html?id=${x.id}" class="speaker-mini"><img src="${x.photo_url || x.image_url || ''}" alt="${x.name}"><div style="flex:1;min-width:0"><div style="font-size:.88rem;font-weight:600">${x.name}</div><div style="font-size:.72rem;color:var(--text-dim)">${x.role}</div></div><svg width="14" height="14" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>`;
-            });
-        } catch(e) {}
+function makeSlug(name) {
+    return (name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
 
-        main.innerHTML = `
-        <div style="position:absolute;inset:0;height:400px;background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(137,0,0,.1),transparent);pointer-events:none"></div>
-        <div class="container" style="position:relative">
-          <div class="reveal" style="margin-bottom:32px"><a href="organizers.html" class="btn-back"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Back to Team</a></div>
-          <div class="hero-grid-2col" style="gap:40px;align-items:start">
-            <div class="reveal" style="position:sticky;top:120px">
-              <div style="display:flex;justify-content:center;margin-bottom:24px"><div class="avatar-ring"><div class="avatar-inner"><img src="${o.photo_url || o.image_url || ''}" alt="${o.name}"></div></div></div>
-              <div style="text-align:center;margin-bottom:20px">
-                <h1 style="font-size:1.6rem;font-weight:800;margin-bottom:5px">${o.name}</h1>
-                <p style="color:var(--text-dim);font-size:.88rem;margin-bottom:10px">${o.role}</p>
-                <span class="tag">TEDxUAP Organizer</span>
-              </div>
-              <div style="display:flex;justify-content:center;gap:10px;margin-bottom:20px">${socials}</div>
-              <div class="detail-card" style="margin-bottom:14px">
-                <div style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--text-faint);margin-bottom:8px">Organization</div>
-                <p style="font-size:.88rem;font-weight:600">TEDxUniversityofAsiaPacific</p>
-                <p style="font-size:.76rem;color:var(--text-dim);margin-top:3px">Class of 2026</p>
-              </div>
-              <a href="index.html#tickets" class="btn-primary" style="width:100%;justify-content:center;display:flex">&#x1F3AB; Join the Event</a>
-            </div>
-            <div>
-              <div class="reveal detail-card" style="margin-bottom:16px">
-                <div style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,0,0,.6);margin-bottom:14px;display:flex;align-items:center;gap:8px"><div style="width:18px;height:1.5px;background:var(--red)"></div> About ${o.name.split(' ')[0]}</div>
-                <p style="color:var(--text);line-height:1.85;font-size:.92rem;font-weight:300">${o.bio || o.description || 'Description coming soon.'}</p>
-              </div>
-              <div class="reveal detail-card" style="margin-bottom:16px;background:linear-gradient(135deg,rgba(137,0,0,.06),rgba(4,15,30,.4));border-color:rgba(137,0,0,.15)">
-                <div style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,0,0,.6);margin-bottom:14px;display:flex;align-items:center;gap:8px"><div style="width:18px;height:1.5px;background:var(--red)"></div> Role at TEDxUAP</div>
-                <div style="display:flex;align-items:flex-start;gap:14px">
-                  <div style="font-size:1.8rem;flex-shrink:0">&#x1F3AF;</div>
-                  <div><h3 style="font-size:1.05rem;font-weight:700;margin-bottom:6px">${o.role}</h3><p style="font-size:.82rem;color:var(--text-dim);line-height:1.6">TEDxUniversityofAsiaPacific is operated under license from TED. All team members are students of UAP, Dhaka.</p></div>
-                </div>
-              </div>
-              ${teamHtml ? `<div class="reveal"><div style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--text-faint);margin-bottom:14px">Rest of the Team</div><div style="display:grid;gap:10px">${teamHtml}</div></div>` : ''}
+(async function() {
+    const main = document.getElementById('mainContent');
+
+    // wait for db
+    let retries = 0;
+    while (!window.db.client && retries < 20) { await new Promise(r => setTimeout(r, 100)); retries++; }
+    if (!window.db.client) { main.innerHTML = '<div style="text-align:center;padding:200px"><h2>Not connected</h2><a href="/organizers.html" class="btn-back" style="margin-top:20px;display:inline-flex">&larr; Back</a></div>'; return; }
+
+    const urlId    = new URLSearchParams(window.location.search).get('id');
+    const pathSlug = window.location.pathname.replace('/organizer-details/', '').replace('/organizer-details.html', '').replace('/', '');
+
+    let o = null;
+    try {
+        if (urlId) {
+            o = await window.db.getById('organizers', urlId);
+        } else if (pathSlug) {
+            const all = await window.db.getActive('organizers');
+            o = all.find(x => makeSlug(x.name) === pathSlug) || null;
+        }
+    } catch(e) { o = null; }
+
+    if (!o) { main.innerHTML = '<div style="text-align:center;padding:200px"><h2>Not Found</h2><a href="/organizers.html" class="btn-back" style="margin-top:20px;display:inline-flex">&larr; Back to Team</a></div>'; return; }
+
+    document.title = o.name + ' — TEDxUAP 2026';
+
+    let socials = '';
+    if (o.linkedin_url) socials += `<a href="${o.linkedin_url}" class="social-btn-lg" target="_blank">in</a>`;
+    if (o.twitter_url)  socials += `<a href="${o.twitter_url}"  class="social-btn-lg" target="_blank">X</a>`;
+    if (o.instagram_url) socials += `<a href="${o.instagram_url}" class="social-btn-lg" target="_blank">ig</a>`;
+
+    let teamHtml = '';
+    try {
+        const others = await window.db.getActive('organizers');
+        others.filter(x => x.id !== o.id).slice(0, 4).forEach(x => {
+            teamHtml += `<a href="/organizer-details/${makeSlug(x.name)}" class="speaker-mini"><img src="${x.photo_url || x.image_url || ''}" alt="${x.name}"><div style="flex:1;min-width:0"><div style="font-size:.88rem;font-weight:600">${x.name}</div><div style="font-size:.72rem;color:var(--text-dim)">${x.role||''}</div></div><svg width="14" height="14" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>`;
+        });
+    } catch(e) {}
+
+    main.innerHTML = `
+    <div style="position:absolute;inset:0;height:400px;background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(137,0,0,.1),transparent);pointer-events:none"></div>
+    <div class="container" style="position:relative">
+      <div class="reveal" style="margin-bottom:32px"><a href="/organizers.html" class="btn-back"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Back to Team</a></div>
+      <div class="hero-grid-2col" style="gap:40px;align-items:start">
+        <div class="reveal" style="position:sticky;top:120px">
+          <div style="display:flex;justify-content:center;margin-bottom:24px"><div class="avatar-ring"><div class="avatar-inner"><img src="${o.photo_url || o.image_url || ''}" alt="${o.name}"></div></div></div>
+          <div style="text-align:center;margin-bottom:20px">
+            <h1 style="font-size:1.6rem;font-weight:800;margin-bottom:5px">${o.name}</h1>
+            <p style="color:var(--text-dim);font-size:.88rem;margin-bottom:10px">${o.role||''}</p>
+            <span class="tag">TEDxUAP Organizer</span>
+          </div>
+          <div style="display:flex;justify-content:center;gap:10px;margin-bottom:20px">${socials}</div>
+          <div class="detail-card" style="margin-bottom:14px">
+            <div style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--text-faint);margin-bottom:8px">Organization</div>
+            <p style="font-size:.88rem;font-weight:600">TEDxUniversityofAsiaPacific</p>
+            <p style="font-size:.76rem;color:var(--text-dim);margin-top:3px">Class of 2026</p>
+          </div>
+          <a href="/index.html#tickets" class="btn-primary" style="width:100%;justify-content:center;display:flex">&#x1F3AB; Join the Event</a>
+        </div>
+        <div>
+          <div class="reveal detail-card" style="margin-bottom:16px">
+            <div style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,0,0,.6);margin-bottom:14px;display:flex;align-items:center;gap:8px"><div style="width:18px;height:1.5px;background:var(--red)"></div> About ${o.name.split(' ')[0]}</div>
+            <p style="color:var(--text);line-height:1.85;font-size:.92rem;font-weight:300">${o.bio || o.description || 'Description coming soon.'}</p>
+          </div>
+          <div class="reveal detail-card" style="margin-bottom:16px;background:linear-gradient(135deg,rgba(137,0,0,.06),rgba(4,15,30,.4));border-color:rgba(137,0,0,.15)">
+            <div style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,0,0,.6);margin-bottom:14px;display:flex;align-items:center;gap:8px"><div style="width:18px;height:1.5px;background:var(--red)"></div> Role at TEDxUAP</div>
+            <div style="display:flex;align-items:flex-start;gap:14px">
+              <div style="font-size:1.8rem;flex-shrink:0">&#x1F3AF;</div>
+              <div><h3 style="font-size:1.05rem;font-weight:700;margin-bottom:6px">${o.role||''}</h3><p style="font-size:.82rem;color:var(--text-dim);line-height:1.6">TEDxUniversityofAsiaPacific is operated under license from TED. All team members are students of UAP, Dhaka.</p></div>
             </div>
           </div>
-        </div>`;
-        setTimeout(initReveals, 50);
-    } catch(e) { main.innerHTML = '<div style="text-align:center;padding:200px"><h2>Error</h2><a href="organizers.html" class="btn-back" style="margin-top:20px;display:inline-flex">&larr; Back</a></div>'; }
+          ${teamHtml ? `<div class="reveal"><div style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--text-faint);margin-bottom:14px">Rest of the Team</div><div style="display:grid;gap:10px">${teamHtml}</div></div>` : ''}
+        </div>
+      </div>
+    </div>`;
+    setTimeout(initReveals, 50);
 })();
 </script>
 </body>

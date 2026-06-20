@@ -48,6 +48,11 @@
 <div id="site-footer"></div>
 
 <script>
+
+function makeSlug(name) {
+    return (name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
 renderHeader('organizers');
 renderFooter();
 
@@ -62,12 +67,12 @@ renderFooter();
         const orgGrid = document.getElementById('orgGrid');
         orgGrid.innerHTML = orgs.length ? orgs.map((o, i) => `
           <div class="org-card reveal" style="transition-delay:${(i%3)*.1}s">
-            <div class="org-card-img"><img src="${o.image || ''}" alt="${o.name}" loading="lazy"><div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(5,7,13,.9))"></div></div>
+            <div class="org-card-img"><img src="${o.photo_url || o.image_url || ''}" alt="${o.name}" loading="lazy"><div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(5,7,13,.9))"></div></div>
             <div class="org-card-body">
               <div style="font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin-bottom:5px;font-weight:600">${o.role}</div>
               <h3 style="font-size:1rem;font-weight:700;margin-bottom:6px">${o.name}</h3>
-              <p style="font-size:.78rem;color:var(--text-dim);line-height:1.6;margin-bottom:14px">${(o.description || '').split('. ').slice(0,2).join('. ')}</p>
-              <a href="organizer-details.html?id=${o.id}" class="btn-sm">View Profile <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+              <p style="font-size:.78rem;color:var(--text-dim);line-height:1.6;margin-bottom:14px">${(o.bio || o.description || '').split('. ').slice(0,2).join('. ')}</p>
+              <a href="/organizer-details/${makeSlug(o.name)}" class="btn-sm">View Profile <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
             </div>
           </div>`).join('')
           : '<p style="grid-column:1/-1;text-align:center;color:var(--text-faint);padding:40px">Team coming soon...</p>';
@@ -75,7 +80,7 @@ renderFooter();
         const volGrid = document.getElementById('volGrid');
         volGrid.innerHTML = vols.length ? vols.map((v, i) => `
           <div class="vol-card reveal" style="transition-delay:${(i%6)*.05}s">
-            <img src="${v.image || ''}" alt="${v.name}" loading="lazy">
+            <img src="${v.photo_url || v.image_url || ''}" alt="${v.name}" loading="lazy">
             <div style="padding:12px 10px">
               <div style="font-size:.82rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${v.name}</div>
               <div style="font-size:.66rem;color:var(--text-faint);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${v.role}</div>

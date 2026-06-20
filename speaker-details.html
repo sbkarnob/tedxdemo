@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Speaker — TEDxUAP 2026</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='6' fill='%23050709'/%3E%3Ctext x='4' y='28' font-family='Arial Black' font-weight='900' font-size='14' fill='white'%3ETED%3C/text%3E%3Ctext x='30' y='28' font-family='Arial Black' font-weight='900' font-size='14' fill='%23FF0000'%3Ex%3C/text%3E%3C/svg%3E"/>
-<link rel="stylesheet" href="css/styles.css"/>
+<link rel="stylesheet" href="/css/styles.css"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/config.js"></script>
-<script src="js/supabase-client.js"></script>
-<script src="js/components.js"></script>
-<script src="js/app.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/supabase-client.js"></script>
+<script src="/js/components.js"></script>
+<script src="/js/app.js"></script>
 </head>
 <body>
 <div id="site-header"></div>
@@ -23,75 +23,92 @@
 renderHeader('speakers');
 renderFooter();
 
+function makeSlug(name) {
+    return (name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
 (async function() {
-    const id = new URLSearchParams(window.location.search).get('id');
     const main = document.getElementById('mainContent');
-    if (!id) { main.innerHTML = '<div style="text-align:center;padding:200px"><h2>Speaker Not Found</h2><a href="speakers.html" class="btn-back" style="margin-top:20px;display:inline-flex">&larr; Back to Speakers</a></div>'; return; }
+
+    // wait for db
+    let retries = 0;
+    while (!window.db.client && retries < 20) { await new Promise(r => setTimeout(r, 100)); retries++; }
+    if (!window.db.client) { main.innerHTML = '<div style="text-align:center;padding:200px"><h2>Not connected</h2><a href="/speakers.html" class="btn-back" style="margin-top:20px;display:inline-flex">&larr; Back</a></div>'; return; }
+
+    // Get ID from ?id= or slug from path /speaker-details/john-doe
+    const urlId   = new URLSearchParams(window.location.search).get('id');
+    const pathSlug = window.location.pathname.replace('/speaker-details/', '').replace('/speaker-details.html', '').replace('/', '');
+
+    let s = null;
     try {
-        // wait for db
-        let retries = 0;
-        while (!window.db.client && retries < 20) { await new Promise(r => setTimeout(r, 100)); retries++; }
-        const s = window.db.client ? await window.db.getById('speakers', id) : null;
-        if (!s) { main.innerHTML = '<div style="text-align:center;padding:200px"><h2>Speaker Not Found</h2><a href="speakers.html" class="btn-back" style="margin-top:20px;display:inline-flex">&larr; Back to Speakers</a></div>'; return; }
-        document.title = s.name + ' — TEDxUAP 2026';
-
-        let socials = '';
-        if (s.socials) {
-            if (s.socials.twitter) socials += `<a href="${s.socials.twitter}" class="social-btn-lg" target="_blank">X</a>`;
-            if (s.socials.linkedin) socials += `<a href="${s.socials.linkedin}" class="social-btn-lg" target="_blank">in</a>`;
-            if (s.socials.website) socials += `<a href="${s.socials.website}" class="social-btn-lg" target="_blank">&#x1F310;</a>`;
+        if (urlId) {
+            s = await window.db.getById('speakers', urlId);
+        } else if (pathSlug) {
+            const all = await window.db.getActive('speakers');
+            s = all.find(x => makeSlug(x.name) === pathSlug) || null;
         }
+    } catch(e) { s = null; }
 
-        let moreHtml = '';
-        try {
-            const others = await window.db.getActive('speakers');
-            others.filter(o => o.id !== id).slice(0, 3).forEach(o => {
-                moreHtml += `<a href="speaker-details.html?id=${o.id}" class="speaker-mini"><img src="${o.photo_url || o.image_url || ''}" alt="${o.name}"><div style="flex:1;min-width:0"><div style="font-size:.88rem;font-weight:600">${o.name}</div><div style="font-size:.72rem;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.title}</div></div><svg width="14" height="14" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>`;
-            });
-        } catch(e) {}
+    if (!s) { main.innerHTML = '<div style="text-align:center;padding:200px"><h2>Speaker Not Found</h2><a href="/speakers.html" class="btn-back" style="margin-top:20px;display:inline-flex">&larr; Back to Speakers</a></div>'; return; }
 
-        main.innerHTML = `
-        <div style="position:absolute;inset:0;height:400px;background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(137,0,0,.1),transparent);pointer-events:none"></div>
-        <div class="container" style="position:relative">
-          <div class="reveal" style="margin-bottom:32px"><a href="speakers.html" class="btn-back"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Back to Speakers</a></div>
-          <div class="hero-grid-2col" style="gap:40px;align-items:start">
-            <div class="reveal" style="position:sticky;top:120px">
-              <div style="display:flex;justify-content:center;margin-bottom:24px"><div class="avatar-ring"><div class="avatar-inner"><img src="${s.photo_url || s.image_url || ''}" alt="${s.name}"></div></div></div>
-              <div style="text-align:center;margin-bottom:20px">
-                <h1 style="font-size:1.6rem;font-weight:800;letter-spacing:-.02em;margin-bottom:5px">${s.name}</h1>
-                <p style="color:var(--text-dim);font-size:.88rem;margin-bottom:10px">${s.title}</p>
-                <span class="tag">TEDxUAP Speaker</span>
+    document.title = s.name + ' — TEDxUAP 2026';
+
+    let socials = '';
+    if (s.linkedin_url) socials += `<a href="${s.linkedin_url}" class="social-btn-lg" target="_blank">in</a>`;
+    if (s.twitter_url)  socials += `<a href="${s.twitter_url}"  class="social-btn-lg" target="_blank">X</a>`;
+    if (s.website_url)  socials += `<a href="${s.website_url}"  class="social-btn-lg" target="_blank">&#x1F310;</a>`;
+    if (!socials && s.socials) {
+        if (s.socials.linkedin) socials += `<a href="${s.socials.linkedin}" class="social-btn-lg" target="_blank">in</a>`;
+        if (s.socials.twitter)  socials += `<a href="${s.socials.twitter}"  class="social-btn-lg" target="_blank">X</a>`;
+    }
+
+    let moreHtml = '';
+    try {
+        const others = await window.db.getActive('speakers');
+        others.filter(o => o.id !== s.id).slice(0, 3).forEach(o => {
+            moreHtml += `<a href="/speaker-details/${makeSlug(o.name)}" class="speaker-mini"><img src="${o.photo_url || o.image_url || ''}" alt="${o.name}"><div style="flex:1;min-width:0"><div style="font-size:.88rem;font-weight:600">${o.name}</div><div style="font-size:.72rem;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.title||''}</div></div><svg width="14" height="14" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>`;
+        });
+    } catch(e) {}
+
+    main.innerHTML = `
+    <div style="position:absolute;inset:0;height:400px;background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(137,0,0,.1),transparent);pointer-events:none"></div>
+    <div class="container" style="position:relative">
+      <div class="reveal" style="margin-bottom:32px"><a href="/speakers.html" class="btn-back"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Back to Speakers</a></div>
+      <div class="hero-grid-2col" style="gap:40px;align-items:start">
+        <div class="reveal" style="position:sticky;top:120px">
+          <div style="display:flex;justify-content:center;margin-bottom:24px"><div class="avatar-ring"><div class="avatar-inner"><img src="${s.photo_url || s.image_url || ''}" alt="${s.name}"></div></div></div>
+          <div style="text-align:center;margin-bottom:20px">
+            <h1 style="font-size:1.6rem;font-weight:800;letter-spacing:-.02em;margin-bottom:5px">${s.name}</h1>
+            <p style="color:var(--text-dim);font-size:.88rem;margin-bottom:10px">${s.title||''}</p>
+            <span class="tag">TEDxUAP Speaker</span>
+          </div>
+          <div style="display:flex;justify-content:center;gap:10px;margin-bottom:20px">${socials}</div>
+          <div class="detail-card" style="margin-bottom:14px">
+            <div style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--text-faint);margin-bottom:8px">Talk Topic</div>
+            <p style="font-size:.84rem;color:rgba(255,255,255,.7);line-height:1.5;font-style:italic">"${s.topic||'TBA'}"</p>
+          </div>
+          <a href="/index.html#tickets" class="btn-primary" style="width:100%;justify-content:center;display:flex">&#x1F3AB; Register to See Live</a>
+        </div>
+        <div>
+          <div class="reveal detail-card" style="margin-bottom:16px">
+            <div style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,0,0,.6);margin-bottom:14px;display:flex;align-items:center;gap:8px"><div style="width:18px;height:1.5px;background:var(--red)"></div> About ${s.name.split(' ')[0]}</div>
+            <p style="color:var(--text);line-height:1.85;font-size:.92rem;font-weight:300">${s.bio || 'Biography coming soon.'}</p>
+          </div>
+          <div class="reveal detail-card" style="margin-bottom:16px;background:linear-gradient(135deg,rgba(137,0,0,.08),rgba(4,15,30,.5));border-color:rgba(137,0,0,.2)">
+            <div style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,0,0,.6);margin-bottom:14px;display:flex;align-items:center;gap:8px"><div style="width:18px;height:1.5px;background:var(--red)"></div> The Talk</div>
+            <div style="display:flex;align-items:flex-start;gap:14px">
+              <div style="font-size:1.8rem;flex-shrink:0">&#x1F3A4;</div>
+              <div>
+                <h3 style="font-size:1.05rem;font-weight:700;line-height:1.4;margin-bottom:6px">"${s.topic||'TBA'}"</h3>
+                <p style="font-size:.82rem;color:var(--text-dim);line-height:1.6">This talk will be presented live at TEDxUniversityofAsiaPacific 2026.</p>
               </div>
-              <div style="display:flex;justify-content:center;gap:10px;margin-bottom:20px">${socials}</div>
-              <div class="detail-card" style="margin-bottom:14px">
-                <div style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--text-faint);margin-bottom:8px">Talk Topic</div>
-                <p style="font-size:.84rem;color:rgba(255,255,255,.7);line-height:1.5;font-style:italic">"${s.topic}"</p>
-              </div>
-              <a href="index.html#tickets" class="btn-primary" style="width:100%;justify-content:center;display:flex">&#x1F3AB; Register to See Live</a>
-            </div>
-            <div>
-              <div class="reveal detail-card" style="margin-bottom:16px">
-                <div style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,0,0,.6);margin-bottom:14px;display:flex;align-items:center;gap:8px"><div style="width:18px;height:1.5px;background:var(--red)"></div> About ${s.name.split(' ')[0]}</div>
-                <p style="color:var(--text);line-height:1.85;font-size:.92rem;font-weight:300">${s.bio || 'Biography coming soon.'}</p>
-              </div>
-              <div class="reveal detail-card" style="margin-bottom:16px;background:linear-gradient(135deg,rgba(137,0,0,.08),rgba(4,15,30,.5));border-color:rgba(137,0,0,.2)">
-                <div style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,0,0,.6);margin-bottom:14px;display:flex;align-items:center;gap:8px"><div style="width:18px;height:1.5px;background:var(--red)"></div> The Talk</div>
-                <div style="display:flex;align-items:flex-start;gap:14px">
-                  <div style="font-size:1.8rem;flex-shrink:0">&#x1F3A4;</div>
-                  <div>
-                    <h3 style="font-size:1.05rem;font-weight:700;line-height:1.4;margin-bottom:6px">"${s.topic}"</h3>
-                    <p style="font-size:.82rem;color:var(--text-dim);line-height:1.6">This talk will be presented live at TEDxUniversityofAsiaPacific 2026.</p>
-                  </div>
-                </div>
-              </div>
-              ${moreHtml ? `<div class="reveal"><div style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--text-faint);margin-bottom:14px">More Speakers</div><div style="display:grid;gap:10px">${moreHtml}</div></div>` : ''}
             </div>
           </div>
-        </div>`;
-        setTimeout(initReveals, 50);
-    } catch(e) {
-        main.innerHTML = '<div style="text-align:center;padding:200px"><h2>Error loading speaker</h2><a href="speakers.html" class="btn-back" style="margin-top:20px;display:inline-flex">&larr; Back</a></div>';
-    }
+          ${moreHtml ? `<div class="reveal"><div style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--text-faint);margin-bottom:14px">More Speakers</div><div style="display:grid;gap:10px">${moreHtml}</div></div>` : ''}
+        </div>
+      </div>
+    </div>`;
+    setTimeout(initReveals, 50);
 })();
 </script>
 </body>
