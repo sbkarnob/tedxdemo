@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Dashboard — TEDxUAP Admin</title>
+<link rel="stylesheet" href="../css/styles.css"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/config.js"></script>
+<script src="../js/supabase-client.js"></script>
+<script src="../js/components.js"></script>
+</head>
+<body>
+<div class="admin-overlay" id="adminOverlay" onclick="closeAdminSidebar()"></div>
+<aside id="adminSidebar"></aside>
+<div class="admin-main">
+  <div id="adminTopbar"></div>
+  <div class="admin-content">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin-bottom:32px">
+      <div class="detail-card" style="text-align:center">
+        <div style="font-size:2rem;font-weight:800;color:var(--red)" id="cntSpeakers">—</div>
+        <div style="font-size:.8rem;color:var(--text-dim);margin-top:4px">Speakers</div>
+      </div>
+      <div class="detail-card" style="text-align:center">
+        <div style="font-size:2rem;font-weight:800;color:var(--red)" id="cntOrganizers">—</div>
+        <div style="font-size:.8rem;color:var(--text-dim);margin-top:4px">Organizers</div>
+      </div>
+      <div class="detail-card" style="text-align:center">
+        <div style="font-size:2rem;font-weight:800;color:var(--red)" id="cntSponsors">—</div>
+        <div style="font-size:.8rem;color:var(--text-dim);margin-top:4px">Sponsors</div>
+      </div>
+      <div class="detail-card" style="text-align:center">
+        <div style="font-size:2rem;font-weight:800;color:var(--red)" id="cntMessages">—</div>
+        <div style="font-size:.8rem;color:var(--text-dim);margin-top:4px">Unread Messages</div>
+      </div>
+      <div class="detail-card" style="text-align:center">
+        <div style="font-size:2rem;font-weight:800;color:var(--red)" id="cntVolunteers">—</div>
+        <div style="font-size:.8rem;color:var(--text-dim);margin-top:4px">Volunteers</div>
+      </div>
+      <div class="detail-card" style="text-align:center">
+        <div style="font-size:2rem;font-weight:800;color:var(--red)" id="cntSchedule">—</div>
+        <div style="font-size:.8rem;color:var(--text-dim);margin-top:4px">Schedule Items</div>
+      </div>
+    </div>
+    <div class="detail-card">
+      <div style="font-weight:700;font-size:1rem;margin-bottom:16px">Quick Links</div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px">
+        <a href="speakers.html" class="admin-btn-primary" style="text-decoration:none">Manage Speakers</a>
+        <a href="organizers.html" class="admin-btn-secondary" style="text-decoration:none">Manage Organizers</a>
+        <a href="schedule.html" class="admin-btn-secondary" style="text-decoration:none">Manage Schedule</a>
+        <a href="messages.html" class="admin-btn-secondary" style="text-decoration:none">View Messages</a>
+        <a href="sponsors.html" class="admin-btn-secondary" style="text-decoration:none">Manage Sponsors</a>
+        <a href="event.html" class="admin-btn-secondary" style="text-decoration:none">Event Details</a>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+renderAdminSidebar('dashboard'); renderAdminTopbar('Dashboard');
+(async function(){
+    if(!await loadAdminUser()) return;
+    try {
+        const [spk, org, spo, vol, sch, msg] = await Promise.all([
+            window.db.getAll('speakers'),
+            window.db.getAll('organizers'),
+            window.db.getAll('sponsors'),
+            window.db.getAll('volunteers'),
+            window.db.getAll('event_schedule'),
+            window.db.unreadCount()
+        ]);
+        document.getElementById('cntSpeakers').textContent = spk.length;
+        document.getElementById('cntOrganizers').textContent = org.length;
+        document.getElementById('cntSponsors').textContent = spo.length;
+        document.getElementById('cntVolunteers').textContent = vol.length;
+        document.getElementById('cntSchedule').textContent = sch.length;
+        document.getElementById('cntMessages').textContent = msg;
+    } catch(e) { console.error(e); }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Speakers — TEDxUAP Admin</title>
+<link rel="stylesheet" href="../css/styles.css"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/config.js"></script>
+<script src="../js/supabase-client.js"></script>
+<script src="../js/components.js"></script>
+</head>
+<body>
+<div class="admin-overlay" id="adminOverlay" onclick="closeAdminSidebar()"></div>
+<aside id="adminSidebar"></aside>
+<div class="admin-main">
+  <div id="adminTopbar"></div>
+  <div class="admin-content">
+    <div class="admin-table-wrap">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
+        <button class="admin-btn-primary" onclick="openModal(null)">+ Add Speaker</button>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="admin-table">
+          <thead>
+            <tr><th>Photo</th><th>Name</th><th>Title</th><th>Topic</th><th>Status</th><th style="width:180px">Actions</th></tr>
+          </thead>
+          <tbody id="tBody">
+            <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-faint)"><span class="spinner"></span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="admin-modal-overlay" id="modal">
+  <div class="admin-modal" style="max-width:580px">
+    <div class="admin-modal-header"><h3 id="modalTitle">Add Speaker</h3><button class="admin-modal-close" onclick="closeModal()">&times;</button></div>
+    <div class="admin-modal-body">
+      <input type="hidden" id="fId">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div class="form-group"><label class="form-label">Full Name *</label><input type="text" id="fName" class="form-input"></div>
+        <div class="form-group"><label class="form-label">Title/Designation *</label><input type="text" id="fTitle" class="form-input" placeholder="e.g. CEO, Professor"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Talk Topic</label><input type="text" id="fTopic" class="form-input" placeholder="Talk title or topic"></div>
+      <div class="form-group"><label class="form-label">Short Bio</label><textarea id="fBio" class="form-input" style="min-height:80px"></textarea></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div class="form-group"><label class="form-label">LinkedIn URL</label><input type="text" id="fLinkedin" class="form-input"></div>
+        <div class="form-group"><label class="form-label">Twitter URL</label><input type="text" id="fTwitter" class="form-input"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Photo</label>
+        <input type="file" id="fPhoto" class="form-input" accept="image/*" onchange="previewImg(this,'photoPreview')">
+        <img id="photoPreview" style="display:none;width:80px;height:80px;object-fit:cover;border-radius:50%;margin-top:8px;border:2px solid var(--red)">
+        <input type="hidden" id="fPhotoUrl">
+      </div>
+      <div class="form-group">
+        <label class="form-label" style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" id="fActive" checked style="accent-color:var(--red)"> Show on website
+        </label>
+      </div>
+      <div class="form-group"><label class="form-label">Display Order</label><input type="number" id="fOrder" class="form-input" value="0" min="0"></div>
+    </div>
+    <div class="admin-modal-footer"><button class="admin-btn-secondary" onclick="closeModal()">Cancel</button><button class="admin-btn-primary" id="saveBtn">Save</button></div>
+  </div>
+</div>
+
+<div class="admin-modal-overlay" id="delModal">
+  <div class="admin-modal" style="max-width:380px">
+    <div class="admin-modal-header"><h3>Delete Speaker</h3><button class="admin-modal-close" onclick="document.getElementById('delModal').classList.remove('show')">&times;</button></div>
+    <div class="admin-modal-body"><p style="color:var(--text-dim)">Are you sure you want to delete this speaker?</p></div>
+    <div class="admin-modal-footer">
+      <button class="admin-btn-secondary" onclick="document.getElementById('delModal').classList.remove('show')">Cancel</button>
+      <button class="admin-btn-primary" id="delBtn" style="background:linear-gradient(135deg,#991b1b,#dc2626);box-shadow:0 0 20px rgba(220,38,38,.2)">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+renderAdminSidebar('speakers'); renderAdminTopbar('Speakers');
+const TABLE = 'speakers'; let delId = null, imgFile = null;
+
+(async function(){
+    if(!await loadAdminUser()) return;
+    loadMsgBadge(); load();
+})();
+
+async function load(){
+    try {
+        var items = await window.db.getAll(TABLE);
+        var tb = document.getElementById('tBody');
+        if(!items.length){ tb.innerHTML='<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-faint)">No speakers yet. Add your first speaker!</td></tr>'; return; }
+        tb.innerHTML = items.map(function(s){
+            var safe = encodeURIComponent(JSON.stringify(s));
+            var photo = s.photo_url ? '<img src="'+s.photo_url+'" style="width:40px;height:40px;object-fit:cover;border-radius:50%;border:1px solid rgba(255,0,0,.3)">' : '<div style="width:40px;height:40px;border-radius:50%;background:rgba(255,0,0,.1);display:flex;align-items:center;justify-content:center;font-size:1.1rem">🎤</div>';
+            return '<tr>'+
+            '<td>'+photo+'</td>'+
+            '<td style="font-weight:600">'+s.name+'</td>'+
+            '<td style="font-size:.82rem;color:var(--text-dim)">'+( s.title||'—')+'</td>'+
+            '<td style="font-size:.82rem;color:var(--text-dim)">'+( s.topic||'—')+'</td>'+
+            '<td><span class="admin-status '+(s.is_active?'active':'inactive')+'"><span class="admin-status-dot"></span>'+(s.is_active?'Active':'Hidden')+'</span></td>'+
+            '<td><div class="admin-actions">'+
+                '<button class="admin-btn-secondary" onclick=\'edit(JSON.parse(decodeURIComponent("'+safe+'")))\'>Edit</button>'+
+                '<button class="admin-btn-secondary danger" onclick="confirmDel(\''+s.id+'\')">Delete</button>'+
+            '</div></td></tr>';
+        }).join('');
+    } catch(e){ console.error(e); document.getElementById('tBody').innerHTML='<tr><td colspan="6" style="text-align:center;padding:40px;color:#fca5a5">Error loading speakers</td></tr>'; }
+}
+
+function previewImg(input, previewId){
+    var f = input.files[0]; if(!f) return;
+    imgFile = f;
+    var r = new FileReader();
+    r.onload = function(e){ var p=document.getElementById(previewId); p.src=e.target.result; p.style.display='block'; };
+    r.readAsDataURL(f);
+}
+
+function openModal(d){
+    document.getElementById('fId').value='';
+    document.getElementById('fName').value='';
+    document.getElementById('fTitle').value='';
+    document.getElementById('fTopic').value='';
+    document.getElementById('fBio').value='';
+    document.getElementById('fLinkedin').value='';
+    document.getElementById('fTwitter').value='';
+    document.getElementById('fPhotoUrl').value='';
+    document.getElementById('fPhoto').value='';
+    document.getElementById('fActive').checked=true;
+    document.getElementById('fOrder').value='0';
+    document.getElementById('photoPreview').style.display='none';
+    document.getElementById('modalTitle').textContent = d ? 'Edit Speaker' : 'Add Speaker';
+    imgFile = null;
+    if(d){
+        document.getElementById('fId').value=d.id;
+        document.getElementById('fName').value=d.name||'';
+        document.getElementById('fTitle').value=d.title||'';
+        document.getElementById('fTopic').value=d.topic||'';
+        document.getElementById('fBio').value=d.bio||'';
+        document.getElementById('fLinkedin').value=d.linkedin_url||'';
+        document.getElementById('fTwitter').value=d.twitter_url||'';
+        document.getElementById('fPhotoUrl').value=d.photo_url||'';
+        document.getElementById('fActive').checked=!!d.is_active;
+        document.getElementById('fOrder').value=d.order_index||0;
+        if(d.photo_url){ var p=document.getElementById('photoPreview'); p.src=d.photo_url; p.style.display='block'; }
+    }
+    document.getElementById('modal').classList.add('show');
+}
+function closeModal(){ document.getElementById('modal').classList.remove('show'); imgFile=null; }
+function edit(d){ openModal(d); }
+function confirmDel(id){ delId=id; document.getElementById('delModal').classList.add('show'); }
+
+document.getElementById('delBtn').addEventListener('click', async function(){
+    if(!delId) return; this.disabled=true; this.innerHTML='<span class="spinner"></span>';
+    try{ await window.db.remove(TABLE,delId); adminToast('Speaker deleted!','success'); document.getElementById('delModal').classList.remove('show'); load(); }
+    catch(e){ adminToast(e.message,'error'); }
+    finally{ delId=null; this.disabled=false; this.textContent='Delete'; }
+});
+
+document.getElementById('saveBtn').addEventListener('click', async function(){
+    var btn=this, id=document.getElementById('fId').value;
+    var name=document.getElementById('fName').value.trim();
+    if(!name){ adminToast('Name is required','error'); return; }
+    btn.disabled=true; btn.innerHTML='<span class="spinner"></span>';
+    try{
+        var photoUrl = document.getElementById('fPhotoUrl').value;
+        if(imgFile){ photoUrl = await window.db.uploadImage(imgFile,'speakers'); }
+        var data={
+            name, title:document.getElementById('fTitle').value.trim(),
+            topic:document.getElementById('fTopic').value.trim(),
+            bio:document.getElementById('fBio').value.trim(),
+            linkedin_url:document.getElementById('fLinkedin').value.trim(),
+            twitter_url:document.getElementById('fTwitter').value.trim(),
+            photo_url:photoUrl,
+            is_active:document.getElementById('fActive').checked,
+            order_index:parseInt(document.getElementById('fOrder').value)||0
+        };
+        if(id) await window.db.update(TABLE,id,data); else await window.db.create(TABLE,data);
+        adminToast(id?'Speaker updated!':'Speaker added!','success'); closeModal(); load();
+    }catch(e){ adminToast(e.message,'error'); }
+    finally{ btn.disabled=false; btn.textContent='Save'; }
+});
+</script>
+</body>
+</html>

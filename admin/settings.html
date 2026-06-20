@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Settings — TEDxUAP Admin</title>
+<link rel="stylesheet" href="../css/styles.css"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/config.js"></script>
+<script src="../js/supabase-client.js"></script>
+<script src="../js/components.js"></script>
+</head>
+<body>
+<div class="admin-overlay" id="adminOverlay" onclick="closeAdminSidebar()"></div>
+<aside id="adminSidebar"></aside>
+<div class="admin-main">
+  <div id="adminTopbar"></div>
+  <div class="admin-content">
+
+    <div class="detail-card" style="max-width:500px">
+      <h3 style="font-size:1rem;font-weight:700;margin-bottom:6px">Profile Settings</h3>
+      <p style="font-size:.82rem;color:var(--text-dim);margin-bottom:24px">Update your admin display name.</p>
+      <div class="form-group"><label class="form-label">Display Name</label><input type="text" id="fName" class="form-input" placeholder="Your name"></div>
+      <button class="admin-btn-primary" id="pBtn" onclick="saveProfile()">Update Profile</button>
+    </div>
+
+    <div class="detail-card" style="max-width:500px;margin-top:20px">
+      <h3 style="font-size:1rem;font-weight:700;margin-bottom:6px">Configuration Status</h3>
+      <p style="font-size:.82rem;color:var(--text-dim);margin-bottom:20px">Edit <code style="background:rgba(255,255,255,.06);padding:2px 8px;border-radius:4px;font-size:.76rem">js/config.js</code> to update.</p>
+      <div style="display:grid;gap:0">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+          <span style="font-size:.82rem;color:var(--text-dim)">Supabase</span>
+          <span id="cfgSupabase"></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+          <span style="font-size:.82rem;color:var(--text-dim)">EmailJS</span>
+          <span id="cfgEmailjs"></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0">
+          <span style="font-size:.82rem;color:var(--text-dim)">Admin Email</span>
+          <span style="font-size:.82rem;color:var(--text)" id="cfgEmail"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-card" style="max-width:500px;margin-top:20px;border-color:rgba(239,68,68,.25)">
+      <h3 style="font-size:1rem;font-weight:700;margin-bottom:6px;color:#fca5a5">Danger Zone</h3>
+      <p style="font-size:.82rem;color:var(--text-dim);margin-bottom:16px">Sign out of the admin panel.</p>
+      <button class="admin-btn-signout" onclick="adminSignOut()">Sign Out</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+renderAdminSidebar('settings'); renderAdminTopbar('Settings');
+
+(async function(){
+    if(!await loadAdminUser()) return;
+    loadMsgBadge();
+    try{ var p=await window.db.getAdminProfile(); if(p) document.getElementById('fName').value=p.full_name||''; }catch(e){}
+
+    // Config status
+    var url = window.CONFIG && window.CONFIG.SUPABASE_URL;
+    var key = window.CONFIG && window.CONFIG.SUPABASE_ANON_KEY;
+    var ejs = window.CONFIG && window.CONFIG.EMAILJS_SERVICE_ID;
+
+    var ok='<span class="admin-status active"><span class="admin-status-dot"></span>Connected</span>';
+    var bad='<span class="admin-status inactive"><span class="admin-status-dot"></span>Not Set</span>';
+
+    document.getElementById('cfgSupabase').innerHTML = (url && url.indexOf('supabase.co')!==-1) ? ok : bad;
+    document.getElementById('cfgEmailjs').innerHTML = (ejs && ejs.length>3) ? ok : bad;
+    document.getElementById('cfgEmail').textContent = (window.CONFIG && window.CONFIG.ADMIN_EMAIL) || '—';
+})();
+
+async function saveProfile(){
+    var btn=document.getElementById('pBtn');
+    var name=document.getElementById('fName').value.trim();
+    if(!name){ adminToast('Enter your name','error'); return; }
+    btn.disabled=true; btn.innerHTML='<span class="spinner"></span>';
+    try{
+        await window.db.createAdminProfile(name);
+        adminToast('Profile updated!','success');
+        document.getElementById('adminName').textContent=name;
+        document.getElementById('adminAvatar').textContent=name[0].toUpperCase();
+    }catch(e){ adminToast(e.message,'error'); }
+    finally{ btn.disabled=false; btn.textContent='Update Profile'; }
+}
+</script>
+</body>
+</html>

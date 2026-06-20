@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Event — TEDxUAP 2026</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='6' fill='%23050709'/%3E%3Ctext x='4' y='28' font-family='Arial Black' font-weight='900' font-size='14' fill='white'%3ETED%3C/text%3E%3Ctext x='30' y='28' font-family='Arial Black' font-weight='900' font-size='14' fill='%23FF0000'%3Ex%3C/text%3E%3C/svg%3E"/>
+<link rel="stylesheet" href="css/styles.css"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/components.js"></script>
+<script src="js/app.js"></script>
+</head>
+<body>
+<div id="site-header"></div>
+
+<!-- HERO -->
+<section style="min-height:80vh;display:flex;align-items:center;position:relative;overflow:hidden;padding-top:100px">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-inner">
+    <div class="hero-grid-2col">
+      <div class="reveal-left">
+        <div class="hero-badge"><span class="hero-badge-dot"></span><span>Event Details 2026</span></div>
+        <h1 class="hero-title"><span style="color:#fff">TED</span><span style="color:#FF0000;text-shadow:0 0 40px rgba(255,0,0,.5)">x</span><br/><span style="color:#fff">University of<br/>Asia Pacific</span></h1>
+        <p style="font-size:1.05rem;font-style:italic;color:rgba(255,255,255,.5);font-weight:300;margin-bottom:28px;line-height:1.6">"Redefining Tomorrow: Voices of a New Generation"</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <a href="#tickets" class="btn-primary">&#x1F3AB; Secure Your Seat</a>
+          <a href="#schedule" class="btn-outline">View Schedule</a>
+        </div>
+      </div>
+      <div class="reveal-right">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div class="info-card"><span style="font-size:1.4rem">&#x1F4CD;</span><div><div class="info-label">Location</div><div class="info-value" id="heroVenue">UAP Auditorium</div><div class="info-sub" id="heroAddress">74/A Green Road</div></div></div>
+          <div class="info-card"><span style="font-size:1.4rem">&#x1F4C5;</span><div><div class="info-label">Date</div><div class="info-value" id="heroDate">TBA, 2026</div><div class="info-sub">Save the date</div></div></div>
+          <div class="info-card"><span style="font-size:1.4rem">&#x23F0;</span><div><div class="info-label">Time</div><div class="info-value" id="heroTime">9:00 AM</div><div class="info-sub" id="heroDoors">Doors open 8:30 AM</div></div></div>
+          <div class="info-card"><span style="font-size:1.4rem">&#x1F3AB;</span><div><div class="info-label">Tickets</div><div class="info-value">Limited</div><div class="info-sub">500 seats only</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OVERVIEW -->
+<section class="section" style="background:linear-gradient(180deg,var(--bg1),var(--bg2))">
+  <div class="container">
+    <div class="hero-grid-2col" style="align-items:start">
+      <div class="reveal-left">
+        <span class="section-tag">About The Event</span>
+        <div class="divider"></div>
+        <h2 class="section-title">Where Ideas Come <span style="color:#FF0000">Alive</span></h2>
+        <p style="color:var(--text);line-height:1.85;font-size:.92rem;margin-top:16px" id="eventDesc">TEDxUniversityofAsiaPacific is a one-day, independently organized TEDx event at the University of Asia Pacific, Dhaka. Operating under license from TED, our event brings together compelling voices in technology, science, social entrepreneurship, design, and human experience.</p>
+      </div>
+      <div class="reveal-right" style="display:grid;gap:14px">
+        <div style="background:linear-gradient(135deg,rgba(137,0,0,.1),rgba(4,15,30,.5));border:1px solid rgba(137,0,0,.2);border-radius:20px;padding:26px">
+          <div style="font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--red);margin-bottom:10px">Event Theme</div>
+          <h3 style="font-size:1.1rem;font-weight:700;line-height:1.4" id="eventTheme">"Redefining Tomorrow: Voices of a New Generation"</h3>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:26px">
+          <div style="font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--text-faint);margin-bottom:14px">By the numbers</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:center">
+            <div><div style="font-size:1.6rem;font-weight:800;color:var(--red)" id="numSpeakers">6+</div><div style="font-size:.66rem;color:var(--text-faint);text-transform:uppercase;letter-spacing:.08em;margin-top:2px">Speakers</div></div>
+            <div><div style="font-size:1.6rem;font-weight:800;color:var(--red)">500</div><div style="font-size:.66rem;color:var(--text-faint);text-transform:uppercase;letter-spacing:.08em;margin-top:2px">Seats</div></div>
+            <div><div style="font-size:1.6rem;font-weight:800;color:var(--red)">1</div><div style="font-size:.66rem;color:var(--text-faint);text-transform:uppercase;letter-spacing:.08em;margin-top:2px">Day</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SCHEDULE -->
+<section class="section" id="schedule" style="background:var(--bg1)">
+  <div class="container">
+    <div class="reveal" style="text-align:center;margin-bottom:48px">
+      <span class="section-tag">The Programme</span>
+      <div class="divider" style="margin:12px auto"></div>
+      <h2 class="section-title">Full Day <span style="color:#FF0000">Schedule</span></h2>
+    </div>
+    <div class="hero-grid-2col" id="scheduleGrid">
+      <div class="reveal"><div style="font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--text-faint);margin-bottom:20px;padding-left:36px">Morning</div><div class="timeline" id="morningTimeline"></div></div>
+      <div class="reveal"><div style="font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--text-faint);margin-bottom:20px;padding-left:36px">Afternoon &amp; Evening</div><div class="timeline" id="afternoonTimeline"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SPEAKERS PREVIEW -->
+<section class="section" style="background:linear-gradient(180deg,var(--bg1),var(--bg2))">
+  <div class="container">
+    <div style="display:flex;justify-content:space-between;align-items:end;margin-bottom:40px;flex-wrap:wrap;gap:16px">
+      <div class="reveal"><span class="section-tag">The Voices</span><div class="divider"></div><h2 class="section-title">Featured <span style="color:#FF0000">Speakers</span></h2></div>
+      <a href="speakers.html" class="btn-outline reveal">Meet All &rarr;</a>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px" id="speakerPreview"></div>
+  </div>
+</section>
+
+<!-- VENUE -->
+<section class="section" style="background:var(--bg2)">
+  <div class="container">
+    <div class="hero-grid-2col" style="align-items:center">
+      <div class="reveal-left">
+        <span class="section-tag">The Venue</span>
+        <div class="divider"></div>
+        <h2 class="section-title" style="margin-bottom:18px">UAP Main <span style="color:#FF0000">Auditorium</span></h2>
+        <p style="color:var(--text);line-height:1.85;margin-bottom:18px;font-size:.92rem">State-of-the-art auditorium with professional acoustics, modern lighting, and 500-seat capacity.</p>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:10px;color:var(--text-dim);font-size:.84rem"><span style="color:var(--red)">&#x1F4CD;</span> 74/A Green Road, Farmgate, Dhaka 1205</div>
+          <div style="display:flex;align-items:center;gap:10px;color:var(--text-dim);font-size:.84rem"><span style="color:var(--red)">&#x1F687;</span> 5 min from Farmgate Metro</div>
+          <div style="display:flex;align-items:center;gap:10px;color:var(--text-dim);font-size:.84rem"><span style="color:var(--red)">&#x1F17F;</span> On-campus parking</div>
+          <div style="display:flex;align-items:center;gap:10px;color:var(--text-dim);font-size:.84rem"><span style="color:var(--red)">&#x267F;</span> Fully accessible</div>
+        </div>
+      </div>
+      <div class="reveal-right">
+        <div class="venue-map" style="margin-bottom:0;border-radius:20px">
+          <div style="position:relative;z-index:1;text-align:center">
+            <div style="font-size:2.5rem;margin-bottom:8px">&#x1F5FA;</div>
+            <div style="font-size:.88rem;font-weight:600">UAP Main Campus</div>
+            <div style="font-size:.72rem;color:var(--text-dim);margin-bottom:12px">74/A Green Road, Dhaka</div>
+            <a href="https://maps.google.com?q=University+of+Asia+Pacific+Dhaka" target="_blank" style="display:inline-block;font-size:.72rem;color:var(--red);text-decoration:none;border:1px solid rgba(255,0,0,.3);padding:5px 14px;border-radius:50px;font-weight:600">Open in Maps &#x2197;</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TICKETS -->
+<section class="section" id="tickets" style="background:var(--bg1)">
+  <div class="container" style="max-width:900px">
+    <div class="ticket-cta reveal">
+      <div class="ticket-glow"></div>
+      <div style="position:relative;z-index:1">
+        <span class="section-tag">Join Us</span>
+        <h2 class="section-title" style="margin:10px 0 14px">Be Part of <span style="color:#FF0000">History</span></h2>
+        <p style="color:var(--text-dim);max-width:460px;margin:0 auto 32px;line-height:1.7;font-size:.92rem">500 seats. 6+ speakers. One day that changes how you see the world.</p>
+        <div style="display:flex;justify-content:center;gap:14px;flex-wrap:wrap">
+          <a href="#" class="btn-primary" style="font-size:.95rem;padding:16px 40px">&#x1F3AB; Register Now</a>
+          <a href="speakers.html" class="btn-outline">Meet Speakers</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section" style="background:var(--bg2)">
+  <div class="container" style="max-width:720px">
+    <div class="reveal" style="text-align:center;margin-bottom:40px">
+      <span class="section-tag">Questions?</span>
+      <div class="divider" style="margin:12px auto"></div>
+      <h2 class="section-title">Frequently Asked <span style="color:#FF0000">Questions</span></h2>
+    </div>
+    <div class="reveal" id="faqContainer"></div>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+
+<script>
+renderHeader('event');
+renderFooter();
+
+// FAQ
+const faqs = [
+    {q:"Who can attend?",a:"The event is open to anyone curious and eager to be inspired — students, professionals, entrepreneurs, and changemakers."},
+    {q:"How do I register?",a:"Registration will open soon. Follow our social channels for the announcement. Tickets are first-come, first-served."},
+    {q:"Is the event free?",a:"Ticket pricing will be announced with registration. Student pricing will be prioritized."},
+    {q:"Will talks be online?",a:"Yes! Selected talks will be on the TEDx YouTube channel after the event."},
+    {q:"Can I volunteer?",a:"Reach out via email at tedx@uap-bd.edu if you're a UAP student interested in future events."},
+    {q:"What is the event theme?",a:"'Redefining Tomorrow: Voices of a New Generation' — centering the most important conversations for those who'll inherit the world."},
+    {q:"Is photography allowed?",a:"Personal photography is permitted. Professional equipment requires prior accreditation."}
+];
+document.getElementById('faqContainer').innerHTML = faqs.map((f,i) => `<div class="faq-item"><button class="faq-question" onclick="toggleFaq(this,${i})"><span>${f.q}</span><span class="faq-icon">+</span></button><div class="faq-answer" id="faq-${i}"><p>${f.a}</p></div></div>`).join('');
+
+// Load dynamic data
+(async function() {
+    try {
+        if (!window.db.client) return;
+        const [details, schedule, speakers] = await Promise.all([
+            window.db.getEventDetails(),
+            window.db.getActive('event_schedule'),
+            window.db.getActive('speakers')
+        ]);
+
+        if (details) {
+            if (details.venue) document.getElementById('heroVenue').textContent = details.venue;
+            if (details.address) document.getElementById('heroAddress').textContent = details.address;
+            if (details.date) document.getElementById('heroDate').textContent = details.date;
+            if (details.time) document.getElementById('heroTime').textContent = details.time;
+            if (details.doors_open) document.getElementById('heroDoors').textContent = 'Doors open ' + details.doors_open;
+            if (details.theme) document.getElementById('eventTheme').textContent = '"' + details.theme + '"';
+            if (details.description) document.getElementById('eventDesc').textContent = details.description;
+        }
+
+        // Schedule
+        const morning = schedule.filter(s => s.session === 'morning');
+        const afternoon = schedule.filter(s => s.session === 'afternoon');
+        function renderTimeline(items, containerId) {
+            document.getElementById(containerId).innerHTML = items.map(s => `<div class="timeline-item"><div class="timeline-dot ${s.type}"></div><div class="timeline-time">${s.time}</div><div class="timeline-title">${s.title}</div><div class="timeline-desc">${s.description || ''}</div></div>`).join('');
+        }
+        renderTimeline(morning, 'morningTimeline');
+        renderTimeline(afternoon, 'afternoonTimeline');
+
+        // Speaker preview
+        const prev = document.getElementById('speakerPreview');
+        prev.innerHTML = speakers.slice(0, 3).map(s => `<a href="speaker-details.html?id=${s.id}" class="speaker-mini"><img src="${s.image || ''}" alt="${s.name}"><div style="flex:1;min-width:0"><div style="font-size:.9rem;font-weight:700">${s.name}</div><div style="font-size:.72rem;color:var(--text-dim)">${s.title}</div><div style="font-size:.7rem;color:rgba(255,0,0,.6);margin-top:3px;font-style:italic;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">"${s.topic}"</div></div></a>`).join('');
+        if (speakers.length) document.getElementById('numSpeakers').textContent = speakers.length + '+';
+
+    } catch(e) { console.error(e); }
+})();
+</script>
+</body>
+</html>

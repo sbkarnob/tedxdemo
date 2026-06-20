@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Speakers — TEDxUAP 2026</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='6' fill='%23050709'/%3E%3Ctext x='4' y='28' font-family='Arial Black' font-weight='900' font-size='14' fill='white'%3ETED%3C/text%3E%3Ctext x='30' y='28' font-family='Arial Black' font-weight='900' font-size='14' fill='%23FF0000'%3Ex%3C/text%3E%3C/svg%3E"/>
+<link rel="stylesheet" href="css/styles.css"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/components.js"></script>
+<script src="js/app.js"></script>
+</head>
+<body>
+<div id="site-header"></div>
+
+<div class="page-hero">
+  <div class="page-hero-bg"></div>
+  <div class="page-hero-grid"></div>
+  <div class="container" style="position:relative;z-index:1;text-align:center">
+    <span class="section-tag">TEDxUAP 2026</span>
+    <div class="divider" style="margin:12px auto"></div>
+    <h1 style="font-size:clamp(2.2rem,6vw,4rem);font-weight:900;letter-spacing:-.03em;margin-bottom:14px">Meet Our <span style="color:#FF0000">Speakers</span></h1>
+    <p style="color:var(--text-dim);font-size:.95rem;max-width:480px;margin:0 auto;line-height:1.7;font-weight:300">Visionaries from across disciplines. Ideas that will reshape how you see the world.</p>
+  </div>
+</div>
+
+<section class="section" style="padding-top:40px">
+  <div class="container">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:40px" class="reveal">
+      <button class="filter-btn active" onclick="filterSpeakers(this,'all')">All</button>
+      <button class="filter-btn" onclick="filterSpeakers(this,'tech')">Technology</button>
+      <button class="filter-btn" onclick="filterSpeakers(this,'science')">Science</button>
+      <button class="filter-btn" onclick="filterSpeakers(this,'social')">Social Impact</button>
+      <button class="filter-btn" onclick="filterSpeakers(this,'design')">Design</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px" id="speakersGrid">
+      <div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--text-faint)"><span class="spinner"></span></div>
+    </div>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+
+<script>
+renderHeader('speakers');
+renderFooter();
+
+let allSpeakers = [];
+async function loadSpeakers() {
+    try {
+        allSpeakers = window.db.client ? await window.db.getActive('speakers') : [];
+        renderSpeakers(allSpeakers);
+    } catch(e) {
+        document.getElementById('speakersGrid').innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--text-faint);padding:40px">Speakers coming soon...</p>';
+    }
+}
+
+function renderSpeakers(list) {
+    const grid = document.getElementById('speakersGrid');
+    if (list.length === 0) {
+        grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--text-faint);padding:40px">No speakers found in this category.</p>';
+        return;
+    }
+    grid.innerHTML = list.map((s, i) => `
+      <div class="card reveal" style="transition-delay:${(i%3)*.1}s">
+        <div class="card-img"><img src="${s.image || ''}" alt="${s.name}" loading="lazy"><div class="card-img-overlay"></div></div>
+        <div class="card-body">
+          <h3 class="card-name">${s.name}</h3>
+          <p class="card-title">${s.title}</p>
+          <p class="card-topic">"${s.topic}"</p>
+          <a href="speaker-details.html?id=${s.id}" class="btn-sm">View Profile <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        </div>
+      </div>`).join('');
+    initReveals();
+}
+
+function filterSpeakers(btn, cat) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const filtered = cat === 'all' ? allSpeakers : allSpeakers.filter(s => s.category === cat);
+    renderSpeakers(filtered);
+}
+
+loadSpeakers();
+</script>
+</body>
+</html>

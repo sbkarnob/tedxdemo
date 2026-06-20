@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Messages — TEDxUAP Admin</title>
+<link rel="stylesheet" href="../css/styles.css"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/config.js"></script>
+<script src="../js/supabase-client.js"></script>
+<script src="../js/components.js"></script>
+</head>
+<body>
+<div class="admin-overlay" id="adminOverlay" onclick="closeAdminSidebar()"></div>
+<aside id="adminSidebar"></aside>
+<div class="admin-main">
+  <div id="adminTopbar"></div>
+  <div class="admin-content">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px">
+      <button class="filter-btn active" onclick="filterMsg(this,'all')">All</button>
+      <button class="filter-btn" onclick="filterMsg(this,'unread')">Unread</button>
+      <button class="filter-btn" onclick="filterMsg(this,'read')">Read</button>
+    </div>
+    <div id="msgList" style="display:grid;gap:12px">
+      <div style="text-align:center;padding:40px;color:var(--text-faint)"><span class="spinner"></span></div>
+    </div>
+  </div>
+</div>
+
+<div class="admin-modal-overlay" id="viewModal">
+  <div class="admin-modal">
+    <div class="admin-modal-header"><h3>Message Details</h3><button class="admin-modal-close" onclick="document.getElementById('viewModal').classList.remove('show')">&times;</button></div>
+    <div class="admin-modal-body" id="viewBody"></div>
+    <div class="admin-modal-footer">
+      <button class="admin-btn-secondary" onclick="document.getElementById('viewModal').classList.remove('show')">Close</button>
+      <button class="admin-btn-primary" id="markReadBtn" style="background:linear-gradient(135deg,#166534,#22c55e);box-shadow:0 0 20px rgba(34,197,94,.2)">Mark as Read</button>
+    </div>
+  </div>
+</div>
+
+<script>
+renderAdminSidebar('messages'); renderAdminTopbar('Messages');
+let allMsgs = [], currentId = null;
+
+(async function(){
+    if(!await loadAdminUser()) return;
+    loadMsgBadge();
+    try{
+        allMsgs = await window.db.getMessages();
+        render(allMsgs);
+    }catch(e){ console.error(e); document.getElementById('msgList').innerHTML='<div style="text-align:center;padding:40px;color:#fca5a5">Error loading messages</div>'; }
+})();
+
+function render(msgs){
+    var el = document.getElementById('msgList');
+    if(!msgs.length){ el.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-faint)">No messages yet.</div>'; return; }
+    el.innerHTML = msgs.map(function(m){
+        var date = new Date(m.created_at).toLocaleString();
+        var unreadStyle = !m.is_read ? 'border-left:3px solid var(--red);' : '';
+        return '<div class="detail-card" style="cursor:pointer;'+unreadStyle+'" onclick="viewMsg(\''+m.id+'\')">'+
+            '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">'+
+              '<div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">'+
+                '<span style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:'+(!m.is_read?'var(--red)':'rgba(255,255,255,.15)')+';box-shadow:'+(!m.is_read?'0 0 6px var(--red)':'none')+'"></span>'+
+                '<div style="min-width:0">'+
+                  '<div style="font-weight:700;font-size:.9rem">'+m.name+'</div>'+
+                  '<div style="font-size:.75rem;color:var(--text-faint);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+m.email+'</div>'+
+                  '<div style="font-size:.82rem;color:var(--text-dim);margin-top:4px">'+m.subject+'</div>'+
+                '</div>'+
+              '</div>'+
+              '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0">'+
+                '<span style="font-size:.68rem;color:var(--text-faint);white-space:nowrap">'+date+'</span>'+
+                '<button class="admin-btn-secondary danger" style="padding:4px 10px;font-size:.7rem" onclick="event.stopPropagation();confirmDel(\''+m.id+'\')">Delete</button>'+
+              '</div>'+
+            '</div>'+
+          '</div>';
+    }).join('');
+}
+
+function filterMsg(btn, type){
+    document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    if(type==='all') render(allMsgs);
+    else if(type==='unread') render(allMsgs.filter(function(m){ return !m.is_read; }));
+    else render(allMsgs.filter(function(m){ return m.is_read; }));
+}
+
+function viewMsg(id){
+    currentId = id;
+    var m = allMsgs.find(function(x){ return x.id===id; });
+    if(!m) return;
+    var date = new Date(m.created_at).toLocaleString();
+    document.getElementById('viewBody').innerHTML =
+        '<div style="margin-bottom:16px">'+
+          '<div style="font-size:1.05rem;font-weight:700;margin-bottom:10px">'+m.subject+'</div>'+
+          '<div style="font-size:.82rem;color:var(--text-dim);margin-bottom:4px"><strong>From:</strong> '+m.name+' ('+m.email+')</div>'+
+          '<div style="font-size:.78rem;color:var(--text-faint)"><strong>Date:</strong> '+date+'</div>'+
+        '</div>'+
+        '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:20px;font-size:.9rem;color:var(--text);line-height:1.8;white-space:pre-wrap">'+m.message+'</div>';
+    document.getElementById('markReadBtn').style.display = m.is_read ? 'none' : 'inline-flex';
+    document.getElementById('viewModal').classList.add('show');
+    if(!m.is_read){ window.db.markRead(id).catch(function(){}); m.is_read=true; render(allMsgs); loadMsgBadge(); }
+}
+
+async function confirmDel(id){
+    if(!confirm('Delete this message?')) return;
+    try{
+        await window.db.deleteMessage(id);
+        allMsgs = allMsgs.filter(function(x){ return x.id!==id; });
+        render(allMsgs);
+        adminToast('Deleted','success');
+    }catch(e){ adminToast(e.message,'error'); }
+}
+
+document.getElementById('markReadBtn').addEventListener('click', async function(){
+    if(!currentId) return;
+    try{
+        await window.db.markRead(currentId);
+        var m = allMsgs.find(function(x){ return x.id===currentId; });
+        if(m) m.is_read=true;
+        render(allMsgs);
+        document.getElementById('viewModal').classList.remove('show');
+        loadMsgBadge();
+        adminToast('Marked as read','success');
+    }catch(e){ adminToast(e.message,'error'); }
+});
+</script>
+</body>
+</html>

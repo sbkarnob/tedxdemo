@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Volunteers — TEDxUAP Admin</title>
+<link rel="stylesheet" href="../css/styles.css"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/config.js"></script>
+<script src="../js/supabase-client.js"></script>
+<script src="../js/components.js"></script>
+</head>
+<body>
+<div class="admin-overlay" id="adminOverlay" onclick="closeAdminSidebar()"></div>
+<aside id="adminSidebar"></aside>
+<div class="admin-main">
+  <div id="adminTopbar"></div>
+  <div class="admin-content">
+    <div class="admin-table-wrap">
+      <!-- Toolbar: title, search, add button -->
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:18px 18px 0">
+        <div>
+          <div style="font-size:1rem;font-weight:700">Volunteers</div>
+          <div style="font-size:.78rem;color:var(--text-faint);margin-top:2px" id="totalLabel">Loading…</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <input type="text" id="searchBox" class="form-input" placeholder="Search volunteers…" style="width:220px" oninput="renderRows()">
+          <button class="admin-btn-primary" onclick="openModal()">+ Add Volunteer</button>
+        </div>
+      </div>
+
+      <div style="overflow-x:auto;margin-top:14px">
+        <table class="admin-table">
+          <thead>
+            <tr><th style="width:56px">Photo</th><th>Name</th><th>Role</th><th>Department</th><th>Status</th><th style="width:200px">Actions</th></tr>
+          </thead>
+          <tbody id="tBody">
+            <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-faint)"><span class="spinner"></span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="admin-modal-overlay" id="modal">
+  <div class="admin-modal">
+    <div class="admin-modal-header"><h3 id="modalTitle">Add Volunteer</h3><button class="admin-modal-close" onclick="closeModal()">&times;</button></div>
+    <div class="admin-modal-body">
+      <form id="sForm" onsubmit="return false">
+        <input type="hidden" id="fId">
+        <div class="form-group"><label class="form-label">Photo</label>
+          <div class="admin-image-upload" id="imgUp" onclick="document.getElementById('fImgFile').click()">
+            <div id="imgPh"><div style="font-size:1.8rem;margin-bottom:6px">📷</div><span style="color:var(--red);font-weight:600">Click to upload</span><br><span style="font-size:.72rem;color:var(--text-faint)">PNG, JPG, WEBP max 2MB</span></div>
+            <img id="imgPrev" style="display:none" alt="Preview">
+          </div>
+          <input type="file" id="fImgFile" accept="image/*" style="display:none" onchange="handleImg(event)">
+          <input type="hidden" id="fImgUrl">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div class="form-group"><label class="form-label">Name *</label><input type="text" id="fName" class="form-input" required></div>
+          <div class="form-group"><label class="form-label">Role *</label><input type="text" id="fRole" class="form-input" placeholder="e.g., Logistics Lead"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div class="form-group"><label class="form-label">Department</label><input type="text" id="fDept" class="form-input" placeholder="e.g., Operations"></div>
+          <div class="form-group"><label class="form-label">Display Order</label><input type="number" id="fOrder" class="form-input" value="0" min="0"></div>
+        </div>
+        <div class="form-group"><label class="form-label">LinkedIn URL</label><input type="url" id="fLinkedin" class="form-input" placeholder="https://linkedin.com/in/..."></div>
+        <div class="form-group"><label class="form-label">Short Bio</label><textarea id="fBio" class="form-input" style="min-height:70px"></textarea></div>
+        <div class="form-group">
+          <label class="form-label" style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <input type="checkbox" id="fActive" checked style="accent-color:var(--red)"> Show on website
+          </label>
+        </div>
+      </form>
+    </div>
+    <div class="admin-modal-footer"><button class="admin-btn-secondary" onclick="closeModal()">Cancel</button><button class="admin-btn-primary" id="saveBtn" onclick="saveItem()">Save</button></div>
+  </div>
+</div>
+
+<div class="admin-modal-overlay" id="delModal">
+  <div class="admin-modal" style="max-width:380px">
+    <div class="admin-modal-header"><h3>Delete Volunteer</h3><button class="admin-modal-close" onclick="document.getElementById('delModal').classList.remove('show')">&times;</button></div>
+    <div class="admin-modal-body"><p style="color:var(--text-dim)">Are you sure you want to delete <strong id="delName">this volunteer</strong>? This can't be undone.</p></div>
+    <div class="admin-modal-footer"><button class="admin-btn-secondary" onclick="document.getElementById('delModal').classList.remove('show')">Cancel</button><button class="admin-btn-primary" id="delBtn" style="background:linear-gradient(135deg,#991b1b,#dc2626);box-shadow:0 0 20px rgba(220,38,38,.2)">Delete</button></div>
+  </div>
+</div>
+
+<script>
+renderAdminSidebar('volunteers');renderAdminTopbar('Volunteers');
+const TABLE='volunteers';let imgFile=null,delId=null,allItems=[];
+
+(async function(){
+    if(!await loadAdminUser()) return;
+    loadMsgBadge();
+    if(new URLSearchParams(window.location.search).get('action')==='add') openModal();
+    load();
+})();
+
+async function load(){
+    try{
+        allItems=await window.db.getAll(TABLE);
+        renderRows();
+    }catch(e){
+        console.error(e);
+        document.getElementById('tBody').innerHTML='<tr><td colspan="6" style="text-align:center;padding:40px;color:#fca5a5">Couldn\'t load volunteers. Please refresh.</td></tr>';
+        document.getElementById('totalLabel').textContent='Error loading volunteers';
+    }
+}
+
+function renderRows(){
+    var q=document.getElementById('searchBox').value.trim().toLowerCase();
+    var items=allItems.filter(function(v){
+        if(!q) return true;
+        return (v.name||'').toLowerCase().indexOf(q)!==-1 || (v.role||'').toLowerCase().indexOf(q)!==-1 || (v.department||'').toLowerCase().indexOf(q)!==-1;
+    });
+
+    var tb=document.getElementById('tBody');
+    document.getElementById('totalLabel').textContent=allItems.length+' volunteer'+(allItems.length===1?'':'s')+' total'+(items.length!==allItems.length?' · '+items.length+' shown':'');
+
+    if(!allItems.length){
+        tb.innerHTML='<tr><td colspan="6" style="text-align:center;padding:48px 20px;color:var(--text-faint)">'+
+            '<div style="font-size:1.8rem;margin-bottom:8px">🤝</div>'+
+            '<div style="font-weight:600;color:rgba(255,255,255,.7);margin-bottom:4px">No volunteers yet</div>'+
+            '<div style="font-size:.8rem;margin-bottom:16px">Add your first volunteer to get started.</div>'+
+            '<button class="admin-btn-primary" onclick="openModal()">+ Add Volunteer</button>'+
+            '</td></tr>';
+        return;
+    }
+    if(!items.length){
+        tb.innerHTML='<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-faint)">No volunteers match your search.</td></tr>';
+        return;
+    }
+
+    tb.innerHTML=items.map(function(v){
+        var safe=encodeURIComponent(JSON.stringify(v));
+        var initial=(v.name||'?').trim().charAt(0).toUpperCase()||'?';
+        var photo=v.photo_url?('<img src="'+v.photo_url+'" class="admin-avatar">'):('<div style="width:38px;height:38px;border-radius:50%;background:rgba(137,0,0,.2);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.8rem">'+initial+'</div>');
+        return '<tr>'+
+        '<td>'+photo+'</td>'+
+        '<td style="font-weight:600">'+(v.name||'—')+'</td>'+
+        '<td><span style="font-size:.78rem;color:var(--text-dim)">'+(v.role||'—')+'</span></td>'+
+        '<td><span style="font-size:.78rem;color:var(--text-dim)">'+(v.department||'—')+'</span></td>'+
+        '<td><span class="admin-status '+(v.is_active?'active':'inactive')+'"><span class="admin-status-dot"></span>'+(v.is_active?'Active':'Hidden')+'</span></td>'+
+        '<td><div class="admin-actions">'+
+            '<button class="admin-btn-secondary" onclick=\'edit(JSON.parse(decodeURIComponent("'+safe+'")))\'>Edit</button>'+
+            '<button class="admin-btn-secondary" onclick="toggle(\''+v.id+'\','+(!v.is_active)+')">'+(v.is_active?'Hide':'Show')+'</button>'+
+            '<button class="admin-btn-secondary danger" onclick="confirmDel(\''+v.id+'\',\''+(v.name||'').replace(/'/g,"\\'")+'\')">Delete</button>'+
+        '</div></td></tr>';
+    }).join('');
+}
+
+function openModal(d){
+    document.getElementById('sForm').reset();document.getElementById('fId').value='';document.getElementById('fImgUrl').value='';imgFile=null;
+    document.getElementById('imgPrev').style.display='none';document.getElementById('imgPh').style.display='block';document.getElementById('imgUp').classList.remove('has-image');
+    document.getElementById('fActive').checked=true;
+    document.getElementById('modalTitle').textContent=d?'Edit Volunteer':'Add Volunteer';
+    if(d){
+        document.getElementById('fId').value=d.id;document.getElementById('fName').value=d.name||'';
+        document.getElementById('fRole').value=d.role||'';
+        document.getElementById('fDept').value=d.department||'';
+        document.getElementById('fLinkedin').value=d.linkedin_url||'';
+        document.getElementById('fBio').value=d.bio||'';
+        document.getElementById('fOrder').value=d.order_index||0;document.getElementById('fImgUrl').value=d.photo_url||'';
+        document.getElementById('fActive').checked=d.is_active!==false;
+        if(d.photo_url){document.getElementById('imgPrev').src=d.photo_url;document.getElementById('imgPrev').style.display='block';document.getElementById('imgPh').style.display='none';document.getElementById('imgUp').classList.add('has-image');}
+    }
+    document.getElementById('modal').classList.add('show');
+}
+function closeModal(){document.getElementById('modal').classList.remove('show');}
+function edit(d){openModal(d);}
+function handleImg(e){
+    var f=e.target.files[0];if(!f)return;
+    if(!CONFIG.ALLOWED_IMAGE_TYPES.includes(f.type)){adminToast('Please use a PNG, JPG, or WEBP file','error');return;}
+    if(f.size>CONFIG.MAX_IMAGE_SIZE){adminToast('Image must be under 2MB','error');return;}
+    imgFile=f;var r=new FileReader();
+    r.onload=function(ev){document.getElementById('imgPrev').src=ev.target.result;document.getElementById('imgPrev').style.display='block';document.getElementById('imgPh').style.display='none';document.getElementById('imgUp').classList.add('has-image');};
+    r.readAsDataURL(f);
+}
+
+async function saveItem(){
+    var btn=document.getElementById('saveBtn'),id=document.getElementById('fId').value;
+    var name=document.getElementById('fName').value.trim();
+    var role=document.getElementById('fRole').value.trim();
+    if(!name||!role){adminToast('Name and role are required','error');return;}
+    btn.disabled=true;var oldLabel=btn.textContent;btn.innerHTML='<span class="spinner"></span>';
+    try{
+        var imgUrl=document.getElementById('fImgUrl').value;
+        if(imgFile) imgUrl=await window.db.uploadImage(imgFile,'volunteers');
+        var data={
+            name:name,role:role,
+            department:document.getElementById('fDept').value.trim()||null,
+            linkedin_url:document.getElementById('fLinkedin').value.trim()||null,
+            bio:document.getElementById('fBio').value.trim()||null,
+            photo_url:imgUrl,
+            order_index:parseInt(document.getElementById('fOrder').value)||0,
+            is_active:document.getElementById('fActive').checked
+        };
+        if(id) await window.db.update(TABLE,id,data); else await window.db.create(TABLE,data);
+        adminToast(id?'Volunteer updated!':'Volunteer added!','success');closeModal();load();
+    }catch(e){adminToast(e.message||'Something went wrong','error');}
+    finally{btn.disabled=false;btn.textContent=oldLabel;}
+}
+
+async function toggle(id,v){
+    try{await window.db.update(TABLE,id,{is_active:v});adminToast(v?'Volunteer shown on website':'Volunteer hidden from website','success');load();}
+    catch(e){adminToast(e.message||'Something went wrong','error');}
+}
+
+function confirmDel(id,name){
+    delId=id;
+    document.getElementById('delName').textContent=name||'this volunteer';
+    document.getElementById('delModal').classList.add('show');
+}
+document.getElementById('delBtn').addEventListener('click',async function(){
+    if(!delId)return;this.disabled=true;this.innerHTML='<span class="spinner"></span>';
+    try{await window.db.remove(TABLE,delId);adminToast('Volunteer deleted','success');document.getElementById('delModal').classList.remove('show');load();}
+    catch(e){adminToast(e.message||'Something went wrong','error');}
+    finally{delId=null;this.disabled=false;this.textContent='Delete';}
+});
+</script>
+</body>
+</html>

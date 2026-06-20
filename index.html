@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TEDxUniversityofAsiaPacific 2026</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='6' fill='%23050709'/%3E%3Ctext x='4' y='28' font-family='Arial Black' font-weight='900' font-size='14' fill='white'%3ETED%3C/text%3E%3Ctext x='30' y='28' font-family='Arial Black' font-weight='900' font-size='14' fill='%23FF0000'%3Ex%3C/text%3E%3C/svg%3E"/>
+<link rel="stylesheet" href="css/styles.css"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/components.js"></script>
+<script src="js/app.js"></script>
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-orb orb-1"></div>
+  <div class="hero-orb orb-2"></div>
+  <div class="hero-inner">
+    <div class="hero-grid-2col">
+      <div class="reveal-left">
+        <div class="hero-badge"><span class="hero-badge-dot"></span><span>LIMITED SEATS &bull; 2026</span></div>
+        <h1 class="hero-title"><span style="color:#fff">Ideas worth</span><br/><span style="color:#FF0000;text-shadow:0 0 40px rgba(255,0,0,.5)">spreading.</span></h1>
+        <p class="hero-tagline">A curated experience of bold ideas, raw conversations, and transformative energy. Join the movement at University of Asia Pacific.</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <a href="#tickets" class="btn-primary">Secure Your Pass &rarr;</a>
+          <a href="event.html" class="btn-outline">View Event</a>
+        </div>
+        <div class="hero-stats">
+          <div><div class="stat-num" id="statSpeakers">6+</div><div class="stat-label">Speakers</div></div>
+          <div><div class="stat-num">500</div><div class="stat-label">Audience</div></div>
+          <div><div class="stat-num">1</div><div class="stat-label">Day</div></div>
+        </div>
+      </div>
+      <div class="reveal-right" style="display:none">
+        <div class="hero-card" style="position:relative">
+          <div class="hero-card-glow"></div>
+          <div style="position:relative;z-index:1">
+            <div style="font-size:.8rem;color:rgba(255,0,0,.6);font-family:'Inter',sans-serif;margin-bottom:10px">// UPCOMING EVENT</div>
+            <h3 style="font-size:1.6rem;font-weight:700;line-height:1.3">"Redefining Tomorrow"</h3>
+            <div style="display:flex;align-items:center;gap:12px;margin-top:16px;color:rgba(255,255,255,.5);font-size:.85rem;flex-wrap:wrap">
+              <span>&#x1F4CD; UAP Auditorium</span><span>&bull;</span><span>&#x1F4C5; 2026</span>
+            </div>
+            <div style="margin-top:20px;height:4px;width:100%;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden">
+              <div style="height:100%;width:65%;background:linear-gradient(90deg,#890000,#FF0000);border-radius:4px"></div>
+            </div>
+            <p style="font-size:.72rem;color:rgba(255,255,255,.3);margin-top:12px">Early bird registration opening soon</p>
+          </div>
+        </div>
+        <div class="floating-tag ft-1">&#x1F3A4; Speakers</div>
+        <div class="floating-tag ft-2">&#x1F680; Ideas</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="section" id="about" style="background:linear-gradient(180deg,var(--bg1),var(--bg2),var(--bg1))">
+  <div class="container">
+    <div class="hero-grid-2col" style="align-items:start">
+      <div class="reveal-left">
+        <span class="section-tag">About TEDx</span>
+        <div class="divider"></div>
+        <h2 class="section-title">What is <span style="color:#FF0000">TEDx</span>?</h2>
+        <p style="color:var(--text);line-height:1.85;margin-top:16px;font-size:.92rem">TEDx is a program of local, self-organized events that bring people together to share a TED-like experience. At TEDxUniversityofAsiaPacific, we gather the brightest minds to share ideas that challenge, inspire, and spark meaningful change.</p>
+        <p style="color:var(--text-dim);line-height:1.85;margin-top:10px;font-size:.88rem">This event is operated under license from TED and organized entirely by students of the University of Asia Pacific, Dhaka.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:28px">
+          <span class="about-pill">&#x1F534; Independently Organized</span>
+          <span class="about-pill">&#x1F534; TED Licensed</span>
+          <span class="about-pill">&#x1F534; Live Talks</span>
+          <span class="about-pill">&#x1F534; Ideas Worth Spreading</span>
+        </div>
+      </div>
+      <div class="reveal-right" style="display:grid;gap:12px">
+        <div class="about-feature"><div class="about-icon">&#x1F4A1;</div><div><h4 style="font-weight:600;margin-bottom:3px;font-size:.92rem">Visionary Talks</h4><p style="font-size:.82rem;color:var(--text-dim);line-height:1.6">Short, powerful talks from thought leaders across disciplines.</p></div></div>
+        <div class="about-feature"><div class="about-icon">&#x1F310;</div><div><h4 style="font-weight:600;margin-bottom:3px;font-size:.92rem">Global Community</h4><p style="font-size:.82rem;color:var(--text-dim);line-height:1.6">Connect with innovators, entrepreneurs, and change-makers.</p></div></div>
+        <div class="about-feature"><div class="about-icon">&#x26A1;</div><div><h4 style="font-weight:600;margin-bottom:3px;font-size:.92rem">Real Impact</h4><p style="font-size:.82rem;color:var(--text-dim);line-height:1.6">Ideas that transform industries, communities, and lives.</p></div></div>
+        <div class="about-feature"><div class="about-icon">&#x1F393;</div><div><h4 style="font-weight:600;margin-bottom:3px;font-size:.92rem">Student Led</h4><p style="font-size:.82rem;color:var(--text-dim);line-height:1.6">Entirely organized by passionate UAP students.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SPEAKERS PREVIEW -->
+<section class="section" id="featured-speakers" style="background:var(--bg1)">
+  <div class="container">
+    <div style="display:flex;justify-content:space-between;align-items:end;margin-bottom:48px;flex-wrap:wrap;gap:20px">
+      <div class="reveal">
+        <span class="section-tag">The Voices</span>
+        <div class="divider"></div>
+        <h2 class="section-title">Featured <span style="color:#FF0000">Speakers</span></h2>
+        <p class="section-sub">Visionaries ready to share ideas that matter.</p>
+      </div>
+      <a href="speakers.html" class="btn-outline reveal">View All Speakers &rarr;</a>
+    </div>
+    <div class="hero-grid-2col" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px" id="featuredGrid">
+      <div style="text-align:center;padding:60px;color:var(--text-faint);grid-column:1/-1"><span class="spinner"></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- EVENT PREVIEW -->
+<section class="section" style="background:linear-gradient(180deg,var(--bg1),var(--bg2))">
+  <div class="container">
+    <div class="event-preview reveal">
+      <div class="hero-grid-2col" style="align-items:center;position:relative;z-index:1">
+        <div>
+          <span class="section-tag">The Event</span>
+          <div class="divider"></div>
+          <h2 class="section-title" style="margin-bottom:16px">A Day of <span style="color:#FF0000">Extraordinary</span> Ideas</h2>
+          <p style="color:var(--text-dim);line-height:1.8;margin-bottom:28px;font-size:.92rem">TEDxUniversityofAsiaPacific brings together captivating speakers, interactive sessions, and a community of curious minds.</p>
+          <a href="event.html" class="btn-primary">View Full Details <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:22px">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+              <div style="width:7px;height:7px;background:var(--red);border-radius:50%;box-shadow:0 0 8px var(--red)"></div>
+              <span style="font-size:.72rem;color:var(--text-faint);text-transform:uppercase;letter-spacing:.1em">Event Theme</span>
+            </div>
+            <h3 style="font-size:1.15rem;font-weight:700;line-height:1.3">"Redefining Tomorrow: Voices of a New Generation"</h3>
+          </div>
+          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:22px">
+            <div style="font-size:.72rem;color:var(--text-faint);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px">Schedule Highlights</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:.82rem;color:rgba(255,255,255,.6)">Opening Ceremony</span><span style="font-size:.76rem;color:var(--red);font-weight:600">09:00</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:.82rem;color:rgba(255,255,255,.6)">Speaker Sessions</span><span style="font-size:.76rem;color:var(--red);font-weight:600">10:00</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:.82rem;color:rgba(255,255,255,.6)">Networking Break</span><span style="font-size:.76rem;color:var(--red);font-weight:600">13:00</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:.82rem;color:rgba(255,255,255,.6)">Closing &amp; Awards</span><span style="font-size:.76rem;color:var(--red);font-weight:600">17:00</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TICKETS -->
+<section class="section" id="tickets" style="background:var(--bg1)">
+  <div class="container" style="max-width:900px">
+    <div class="ticket-cta reveal">
+      <div class="ticket-glow"></div>
+      <div style="position:relative;z-index:1">
+        <span class="section-tag">Reserve Your Seat</span>
+        <h2 class="section-title" style="margin:10px 0 14px">Get Your <span style="color:#FF0000">Ticket</span> Now</h2>
+        <p style="color:var(--text-dim);max-width:480px;margin:0 auto 32px;line-height:1.7;font-size:.92rem">Be part of a transformative experience. Limited seats available &mdash; secure your spot before it's too late.</p>
+        <div style="display:flex;justify-content:center;gap:14px;flex-wrap:wrap">
+          <a href="#" class="btn-primary" style="font-size:.95rem;padding:16px 40px">&#x1F3AB; Register Now</a>
+          <a href="event.html" class="btn-outline">Learn More</a>
+        </div>
+        <p style="margin-top:20px;font-size:.76rem;color:rgba(255,255,255,.2)">* Registration opens soon. Follow our social channels for updates.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SPONSORS -->
+<section class="section" id="sponsors" style="background:var(--bg2)">
+  <div class="container">
+    <div class="reveal" style="text-align:center;margin-bottom:48px">
+      <span class="section-tag">Our Partners</span>
+      <div class="divider" style="margin:12px auto"></div>
+      <h2 class="section-title">Event <span style="color:#FF0000">Sponsors</span></h2>
+      <p style="color:var(--text-faint);margin-top:8px;font-size:.85rem">Proudly supported by visionary organizations</p>
+    </div>
+    <div class="reveal" style="margin-bottom:40px;text-align:center;display:none" id="poweredBySponsors">
+      <p style="font-size:.65rem;letter-spacing:.25em;text-transform:uppercase;color:var(--text-faint);margin-bottom:20px">Powered By</p>
+      <div style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap" id="poweredByGrid"></div>
+    </div>
+    <div class="reveal" style="margin-bottom:40px;text-align:center;display:none" id="platinumSponsors">
+      <p style="font-size:.65rem;letter-spacing:.25em;text-transform:uppercase;color:var(--text-faint);margin-bottom:20px">Platinum Sponsor</p>
+      <div style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap" id="platinumGrid"></div>
+    </div>
+    <div class="reveal" style="margin-bottom:40px;text-align:center;display:none" id="goldSponsors">
+      <p style="font-size:.65rem;letter-spacing:.25em;text-transform:uppercase;color:var(--text-faint);margin-bottom:20px">Gold Sponsors</p>
+      <div style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap" id="goldGrid"></div>
+    </div>
+    <div class="reveal" style="margin-bottom:40px;text-align:center;display:none" id="silverSponsors">
+      <p style="font-size:.65rem;letter-spacing:.25em;text-transform:uppercase;color:var(--text-faint);margin-bottom:20px">Silver Sponsors</p>
+      <div style="display:flex;justify-content:center;gap:14px;flex-wrap:wrap" id="silverGrid"></div>
+    </div>
+    <div class="reveal" style="text-align:center;display:none" id="bronzeSponsors">
+      <p style="font-size:.65rem;letter-spacing:.25em;text-transform:uppercase;color:var(--text-faint);margin-bottom:20px">Bronze Sponsors</p>
+      <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap" id="bronzeGrid"></div>
+    </div>
+  </div>
+</section>
+
+<!-- PARTNERS -->
+<section class="section" id="partners" style="display:none">
+  <div class="container">
+    <div class="reveal" style="text-align:center;margin-bottom:48px">
+      <span class="section-tag">Helping Make It Happen</span>
+      <div class="divider" style="margin:12px auto"></div>
+      <h2 class="section-title">Our <span style="color:#FF0000">Partners</span></h2>
+      <p style="color:var(--text-faint);margin-top:8px;font-size:.85rem">The teams behind the scenes who help bring the event to life</p>
+    </div>
+    <div id="partnerGroups"></div>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+
+<script>
+renderHeader('home');
+renderFooter();
+
+// Show hero card on desktop
+if (window.innerWidth >= 1024) {
+    document.querySelector('.reveal-right').style.display = 'block';
+}
+window.addEventListener('resize', function() {
+    document.querySelector('.reveal-right').style.display = window.innerWidth >= 1024 ? 'block' : 'none';
+});
+
+// Load data from Supabase
+async function loadHomeData() {
+    try {
+        if (!window.db.client) {
+            // Fallback: show placeholder
+            document.getElementById('featuredGrid').innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--text-faint);padding:40px">Speakers coming soon...</p>';
+            showFallbackSponsors();
+            return;
+        }
+
+        const [speakers, sponsorRows] = await Promise.all([
+            window.db.getActive('speakers'),
+            window.db.getActive('sponsors')
+        ]);
+
+        // Speakers
+        const grid = document.getElementById('featuredGrid');
+        if (speakers.length > 0) {
+            grid.innerHTML = speakers.slice(0, 3).map((s, i) => `
+                <div class="card reveal" style="transition-delay:${i * .1}s">
+                  <div class="card-img"><img src="${s.image || ''}" alt="${s.name}" loading="lazy"><div class="card-img-overlay"></div></div>
+                  <div class="card-body">
+                    <h3 class="card-name">${s.name}</h3>
+                    <p class="card-title">${s.title}</p>
+                    <a href="speaker-details.html?id=${s.id}" class="btn-sm">View Profile <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+                  </div>
+                </div>`).join('');
+            initReveals();
+        } else {
+            grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--text-faint);padding:40px">Speakers coming soon...</p>';
+        }
+
+        // Split into sponsors (tier-based) and partners (custom type)
+        const sponsors = sponsorRows.filter(s => (s.kind || 'sponsor') === 'sponsor');
+        const partners = sponsorRows.filter(s => s.kind === 'partner');
+
+        renderSponsorTiers(sponsors);
+        renderPartnerGroups(partners);
+
+        // Update stat
+        if (speakers.length > 0) {
+            document.getElementById('statSpeakers').textContent = speakers.length + '+';
+        }
+    } catch (e) {
+        console.error('Error loading home data:', e);
+    }
+}
+
+function sponsorLogoHtml(sp) {
+    return sp.logo_url
+        ? `<div class="sponsor-logo"><img src="${sp.logo_url}" alt="${sp.name}"></div>`
+        : `<div class="sponsor-logo"><span class="sponsor-logo-text">${sp.name}</span></div>`;
+}
+
+function renderSponsorTiers(sponsors) {
+    const tierRows = [
+        { tier: 'powered_by', sectionId: 'poweredBySponsors', gridId: 'poweredByGrid' },
+        { tier: 'platinum', sectionId: 'platinumSponsors', gridId: 'platinumGrid' },
+        { tier: 'gold', sectionId: 'goldSponsors', gridId: 'goldGrid' },
+        { tier: 'silver', sectionId: 'silverSponsors', gridId: 'silverGrid' },
+        { tier: 'bronze', sectionId: 'bronzeSponsors', gridId: 'bronzeGrid' }
+    ];
+
+    if (!sponsors.length) { showFallbackSponsors(); return; }
+
+    tierRows.forEach(row => {
+        const items = sponsors.filter(s => s.tier === row.tier);
+        const section = document.getElementById(row.sectionId);
+        const gridEl = document.getElementById(row.gridId);
+        if (items.length) {
+            gridEl.innerHTML = items.map(sponsorLogoHtml).join('');
+            section.style.display = 'block';
+        } else {
+            section.style.display = 'none';
+        }
+    });
+}
+
+function showFallbackSponsors() {
+    document.getElementById('platinumSponsors').style.display = 'block';
+    document.getElementById('platinumGrid').innerHTML = '<div class="sponsor-logo"><span class="sponsor-logo-text">Platinum Sponsor</span></div>';
+    document.getElementById('goldSponsors').style.display = 'block';
+    document.getElementById('goldGrid').innerHTML = '<div class="sponsor-logo"><span class="sponsor-logo-text">Gold Sponsor</span></div>';
+}
+
+function renderPartnerGroups(partners) {
+    const section = document.getElementById('partners');
+    const wrap = document.getElementById('partnerGroups');
+    if (!partners.length) { section.style.display = 'none'; wrap.innerHTML = ''; return; }
+
+    // Group by partner_type, preserving first-seen order, then by order_index within each group
+    const groups = {};
+    const typeOrder = [];
+    partners.forEach(p => {
+        const type = (p.partner_type || 'Partner').trim() || 'Partner';
+        if (!groups[type]) { groups[type] = []; typeOrder.push(type); }
+        groups[type].push(p);
+    });
+
+    wrap.innerHTML = typeOrder.map(type => `
+        <div class="reveal" style="margin-bottom:40px;text-align:center">
+          <p style="font-size:.65rem;letter-spacing:.25em;text-transform:uppercase;color:var(--text-faint);margin-bottom:20px">${type}</p>
+          <div style="display:flex;justify-content:center;gap:14px;flex-wrap:wrap">
+            ${groups[type].map(sponsorLogoHtml).join('')}
+          </div>
+        </div>`).join('');
+
+    section.style.display = 'block';
+    initReveals();
+}
+loadHomeData();
+</script>
+</body>
+</html>
