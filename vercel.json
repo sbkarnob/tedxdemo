@@ -11,8 +11,6 @@
     { "source": "/admin/messages", "destination": "/admin/messages.html" },
     { "source": "/admin/event", "destination": "/admin/event.html" },
     { "source": "/admin/settings", "destination": "/admin/settings.html" },
-    { "source": "/admin/reset-password", "destination": "/admin/reset-password.html" },
-    { "source": "/speaker-details/:slug", "destination": "/speaker-details.html" },
-    { "source": "/organizer-details/:slug", "destination": "/organizer-details.html" }
+    { "source": "/admin/reset-password", "destination": "/admin/reset-password.html" }
   ]
 }
