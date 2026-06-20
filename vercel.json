@@ -1,3 +1,16 @@
 {
-  "cleanUrls": false
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/admin", "destination": "/admin/index.html" },
+    { "source": "/admin/dashboard", "destination": "/admin/dashboard.html" },
+    { "source": "/admin/speakers", "destination": "/admin/speakers.html" },
+    { "source": "/admin/organizers", "destination": "/admin/organizers.html" },
+    { "source": "/admin/volunteers", "destination": "/admin/volunteers.html" },
+    { "source": "/admin/sponsors", "destination": "/admin/sponsors.html" },
+    { "source": "/admin/schedule", "destination": "/admin/schedule.html" },
+    { "source": "/admin/messages", "destination": "/admin/messages.html" },
+    { "source": "/admin/event", "destination": "/admin/event.html" },
+    { "source": "/admin/settings", "destination": "/admin/settings.html" },
+    { "source": "/admin/reset-password", "destination": "/admin/reset-password.html" }
+  ]
 }
