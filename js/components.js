@@ -8,11 +8,11 @@ function renderHeader(active) {
     const el = document.getElementById('site-header');
     if (!el) return;
     const links = [
-        { href: 'index.html', label: 'Home', id: 'home' },
-        { href: 'speakers.html', label: 'Speakers', id: 'speakers' },
-        { href: 'organizers.html', label: 'Organizers', id: 'organizers' },
-        { href: 'event.html', label: 'Event', id: 'event' },
-        { href: 'contact.html', label: 'Contact', id: 'contact' }
+        { href: '/index.html', label: 'Home', id: 'home' },
+        { href: '/speakers.html', label: 'Speakers', id: 'speakers' },
+        { href: '/organizers.html', label: 'Organizers', id: 'organizers' },
+        { href: '/event.html', label: 'Event', id: 'event' },
+        { href: '/contact.html', label: 'Contact', id: 'contact' }
     ];
     const navLinks = links.map(l => `<a href="${l.href}" class="nav-link${active === l.id ? ' active' : ''}">${l.label}</a>`).join('');
     const mobileLinks = links.map(l => `<a href="${l.href}" class="mobile-nav-link" onclick="closeMobileMenu()">${l.label}</a>`).join('');
